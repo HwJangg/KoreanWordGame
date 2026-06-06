@@ -384,9 +384,9 @@ function init() {
     buildKeyboard();
     imeReset();
     setMsg('');
-    document.getElementById('submit-btn').disabled = false;
     document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
     document.getElementById('submit-btn').onclick = submit;
+    updateCurrentRow();
 }
 
 const DUBEOLSIK = {
