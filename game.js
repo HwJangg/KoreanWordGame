@@ -18,9 +18,10 @@ const VALID_3VOWEL = new Set(JUNG_KEYS.filter(k => k.length === 3)); // {'hkl','
 const JAMO_START   = 0x3131;
 const JAMO_END     = 0x3163;
 
-// 자모 5개짜리 단어 목록 (매일 랜덤 선택)
+// 단어 목록 — 순서대로 하루씩 출제
+const WORDS_UPDATED = '2026-06-07 00:00';
 const WORDS = [
-    '기만',
+    '동시',
 ];
 
 const MAX = 5;
@@ -177,6 +178,7 @@ function init() {
     buildBoard();
     setMsg('');
     document.getElementById('submit-btn').disabled = false;
+    document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
 
     const input = document.getElementById('guess-input');
     input.focus();

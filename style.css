@@ -41,6 +41,12 @@ header p {
     color: #818384;
 }
 
+#words-updated {
+    font-size: 0.72rem;
+    color: #555;
+    margin-top: 3px;
+}
+
 /* ── Board ── */
 #board {
     display: flex;
