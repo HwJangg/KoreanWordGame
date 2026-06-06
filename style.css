@@ -71,6 +71,7 @@ header p {
 }
 
 .cell.filled  { border-color: var(--border-filled); }
+.cell.preview { border-color: #fff; color: #fff; }
 .cell.green   { background: var(--green);  border-color: var(--green);  color: #fff; }
 .cell.yellow  { background: var(--yellow); border-color: var(--yellow); color: #fff; }
 .cell.gray    { background: var(--gray);   border-color: var(--gray);   color: #fff; }
@@ -82,29 +83,13 @@ header p {
 }
 .cell.pop { animation: pop 0.1s ease; }
 
-/* ── Controls ── */
-#controls {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-}
-
-#guess-input {
-    padding: 10px 14px;
-    font-size: 1rem;
-    background: var(--bg);
-    color: var(--text);
-    border: 2px solid var(--border-filled);
-    border-radius: 6px;
-    width: 200px;
-    outline: none;
-    transition: border-color 0.15s;
-}
-#guess-input:focus { border-color: #fff; }
-
+/* ── Submit button ── */
 #submit-btn {
-    padding: 10px 20px;
-    font-size: 1rem;
+    width: 100%;
+    max-width: 480px;
+    padding: 14px;
+    margin-top: 8px;
+    font-size: 1.1rem;
     font-weight: 700;
     background: var(--green);
     color: #fff;

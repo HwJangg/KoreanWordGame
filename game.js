@@ -185,7 +185,7 @@ function imeInput(jamo) {
             }
         }
     }
-    document.getElementById('guess-input').value = imeDisplay();
+    updateCurrentRow();
 }
 
 function imeBackspace() {
@@ -209,12 +209,35 @@ function imeBackspace() {
             s.jong = off % 28;
         }
     }
-    document.getElementById('guess-input').value = imeDisplay();
+    updateCurrentRow();
 }
 
 function imeReset() {
     ime = { done: '', cho: -1, jung: -1, jong: 0 };
-    document.getElementById('guess-input').value = '';
+}
+
+// 현재 IME 상태를 개별 자모 배열로 변환 (보드 미리보기용)
+function imeJamo() {
+    const out = decomposeJamo(ime.done);
+    const { cho, jung, jong } = ime;
+    if (cho >= 0) {
+        out.push(CHO_CHARS[cho]);
+        if (jung >= 0) {
+            out.push(...JUNG_JAMO[jung].split(''));
+            if (jong > 0) out.push(...JONG_JAMO[jong].split(''));
+        }
+    }
+    return out;
+}
+
+function updateCurrentRow() {
+    const jamo = imeJamo();
+    for (let c = 0; c < 5; c++) {
+        const cell = document.getElementById(`c${attempt}${c}`);
+        if (!cell) return;
+        cell.textContent = jamo[c] || '';
+        cell.className = jamo[c] ? 'cell preview' : 'cell';
+    }
 }
 
 // ── 키보드 ────────────────────────────────────────────────────────────────
@@ -286,7 +309,7 @@ function reveal(row, result) {
         setTimeout(() => {
             const cell = document.getElementById(`c${row}${col}`);
             cell.textContent = jamo;
-            cell.classList.add('filled', color);
+            cell.className = 'cell filled ' + color;
         }, col * 130);
     });
 }
@@ -300,11 +323,13 @@ function setMsg(text, type = '') {
 function submit() {
     if (gameOver) return;
     const guess = imeDisplay().trim();
-    imeReset();
     if (!guess) return;
 
     const err = validateGuess(guess);
     if (err) { setMsg(err, 'error'); return; }
+
+    imeReset();
+    updateCurrentRow(); // preview 클리어
 
     setMsg('');
     const result = judge(answer, guess);
@@ -340,10 +365,8 @@ function init() {
     setMsg('');
     document.getElementById('submit-btn').disabled = false;
     document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
-
-    const input = document.getElementById('guess-input');
-    input.onkeydown = e => { if (e.key === 'Enter') submit(); };
     document.getElementById('submit-btn').onclick = submit;
 }
 
 document.addEventListener('DOMContentLoaded', init);
+document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
