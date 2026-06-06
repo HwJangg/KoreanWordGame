@@ -275,7 +275,21 @@ function buildKeyboard() {
             if (jamo === '←') {
                 key.className = 'kb-key kb-back';
                 key.textContent = '⌫';
-                key.addEventListener('pointerdown', e => { e.preventDefault(); if (!gameOver) imeBackspace(); });
+                let bsRepeat = null;
+                key.addEventListener('pointerdown', e => {
+                    e.preventDefault();
+                    if (gameOver) return;
+                    imeBackspace();
+                    bsRepeat = setTimeout(function repeat() {
+                        if (gameOver) return;
+                        imeBackspace();
+                        bsRepeat = setTimeout(repeat, 35);
+                    }, 400);
+                });
+                const stopBs = () => { clearTimeout(bsRepeat); bsRepeat = null; };
+                key.addEventListener('pointerup', stopBs);
+                key.addEventListener('pointercancel', stopBs);
+                key.addEventListener('pointerleave', stopBs);
             } else {
                 key.id = 'key-' + jamo.codePointAt(0);
                 key.className = 'kb-key';
