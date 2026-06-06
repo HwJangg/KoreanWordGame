@@ -336,7 +336,7 @@ function buildKeyboard() {
                     bsRepeat = setTimeout(function repeat() {
                         if (gameOver) return;
                         imeBackspace();
-                        bsRepeat = setTimeout(repeat, 35);
+                        bsRepeat = setTimeout(repeat, 75);
                     }, 400);
                 });
                 const stopBs = () => { clearTimeout(bsRepeat); bsRepeat = null; };
