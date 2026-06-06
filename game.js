@@ -19,9 +19,9 @@ const JAMO_START   = 0x3131;
 const JAMO_END     = 0x3163;
 
 // 단어 목록 — 순서대로 하루씩 출제
-const WORDS_UPDATED = '2026-06-07 00:00';
+const WORDS_UPDATED = '2026-06-07 12:33';
 const WORDS = [
-    '동시',
+    '포장',
 ];
 
 const MAX = 5;
