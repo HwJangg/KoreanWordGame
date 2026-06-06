@@ -19,9 +19,9 @@ const JAMO_START   = 0x3131;
 const JAMO_END     = 0x3163;
 
 // 단어 목록 — 순서대로 하루씩 출제
-const WORDS_UPDATED = '2026-06-07 02:08';
+const WORDS_UPDATED = '2026-06-07 02:20';
 const WORDS = [
-    '서울',
+    '저녁',
 ];
 
 const MAX = 5;
@@ -149,7 +149,7 @@ function imeInput(jamo) {
         // 모음
         const vc = JUNG_IDX[jamo];
         if (s.cho < 0) {
-            s.cho = 11; s.jung = vc; // 묵음 ㅇ + 모음
+            return; // 자음 없이 모음 입력 무시
         } else if (s.jung < 0) {
             s.jung = vc;
         } else if (s.jong === 0) {
@@ -195,6 +195,7 @@ function imeInput(jamo) {
             }
         }
     }
+    while (imeJamo().length > 5) imeBackspace();
     updateCurrentRow();
 }
 
@@ -267,9 +268,17 @@ let jamoState = {};
 function buildKeyboard() {
     const kb = document.getElementById('keyboard');
     kb.innerHTML = '';
+    const maxKeys = Math.max(...KEYBOARD_ROWS.map(r => r.length));
     for (const row of KEYBOARD_ROWS) {
         const rowEl = document.createElement('div');
         rowEl.className = 'kb-row';
+        const pad = maxKeys - row.length;
+        const padL = Math.floor(pad / 2), padR = Math.ceil(pad / 2);
+        for (let i = 0; i < padL; i++) {
+            const sp = document.createElement('div');
+            sp.className = 'kb-key kb-spacer';
+            rowEl.appendChild(sp);
+        }
         for (const jamo of row) {
             const key = document.createElement('div');
             if (jamo === '←') {
@@ -304,6 +313,11 @@ function buildKeyboard() {
                 });
             }
             rowEl.appendChild(key);
+        }
+        for (let i = 0; i < padR; i++) {
+            const sp = document.createElement('div');
+            sp.className = 'kb-key kb-spacer';
+            rowEl.appendChild(sp);
         }
         kb.appendChild(rowEl);
     }
