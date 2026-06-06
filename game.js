@@ -124,6 +124,10 @@ const CJUNG = {
 // 겹모음 분리: compound jung → first jung
 const SJUNG = {1:0,3:2,5:4,7:6,9:8,10:8,11:8,14:13,15:13,16:13,19:18};
 const CHO_CHARS = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+// 쌍자음 합성: cho+same → double cho (ㄱ+ㄱ→ㄲ 등)
+const CCHO = {'0,0':1,'3,3':4,'7,7':8,'9,9':10,'12,12':13};
+// 쌍자음 분리: double → single
+const SCHO = {1:0,4:3,8:7,10:9,13:12};
 
 let ime = { done: '', cho: -1, jung: -1, jong: 0 };
 
@@ -175,8 +179,9 @@ function imeInput(jamo) {
         if (s.cho < 0) {
             s.cho = cc;
         } else if (s.jung < 0) {
-            s.done += CHO_CHARS[s.cho];
-            s.cho = cc; s.jong = 0;
+            const compCho = CCHO[`${s.cho},${cc}`];
+            if (compCho !== undefined) { s.cho = compCho; }
+            else { s.done += CHO_CHARS[s.cho]; s.cho = cc; s.jong = 0; }
         } else if (s.jong === 0) {
             if (jc > 0) s.jong = jc;
             else { s.done += makeSyl(s.cho, s.jung, 0); s.cho = cc; s.jung = -1; s.jong = 0; }
@@ -202,7 +207,8 @@ function imeBackspace() {
         const prev = SJUNG[s.jung];
         s.jung = prev !== undefined ? prev : -1;
     } else if (s.cho >= 0) {
-        s.cho = -1;
+        const prev = SCHO[s.cho];
+        s.cho = prev !== undefined ? prev : -1;
     } else if (s.done.length > 0) {
         const last = s.done[s.done.length - 1];
         s.done = s.done.slice(0, -1);
@@ -226,7 +232,7 @@ function imeJamo() {
     const out = decomposeJamo(ime.done);
     const { cho, jung, jong } = ime;
     if (cho >= 0) {
-        out.push(CHO_CHARS[cho]);
+        out.push(...CHO_JAMO[cho].split(''));
         if (jung >= 0) {
             out.push(...JUNG_JAMO[jung].split(''));
             if (jong > 0) out.push(...JONG_JAMO[jong].split(''));
