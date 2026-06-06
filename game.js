@@ -337,7 +337,7 @@ function buildKeyboard() {
                         if (gameOver) return;
                         imeBackspace();
                         bsRepeat = setTimeout(repeat, 35);
-                    }, 400);
+                    }, 30);
                 });
                 const stopBs = () => { clearTimeout(bsRepeat); bsRepeat = null; };
                 key.addEventListener('pointerup', stopBs);
