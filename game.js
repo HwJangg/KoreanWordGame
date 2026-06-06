@@ -1,6 +1,6 @@
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
-const WORDS_UPDATED = '2026-06-07 03:01';
+const WORDS_UPDATED = '2026-06-07 03:07';
 const LAST_ANSWER   = '라면';
 const WORDS = [
     '아침',
@@ -356,7 +356,7 @@ function buildKeyboard() {
                     lastPress = now;
                     acceptTimer = setTimeout(() => {
                         if (!gameOver) imeInput(jamo);
-                    }, 30);
+                    }, 50);
                 });
                 const cancelAccept = () => { clearTimeout(acceptTimer); acceptTimer = null; };
                 key.addEventListener('pointerup', cancelAccept);
