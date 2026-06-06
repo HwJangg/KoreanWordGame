@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>한글 단어 맞추기</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>한글 단어 맞추기</h1>
+        <p>자모 5개짜리 한글 단어를 5번 안에 맞춰보세요</p>
+    </header>
+
+    <main>
+        <div id="board"></div>
+
+        <div id="controls">
+            <input type="text" id="guess-input"
+                   placeholder="한글 단어 입력"
+                   maxlength="10"
+                   autocomplete="off"
+                   autocorrect="off"
+                   spellcheck="false">
+            <button id="submit-btn">입력</button>
+        </div>
+
+        <p id="message"></p>
+    </main>
+
+    <script src="korean_utils.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
