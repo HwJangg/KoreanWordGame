@@ -105,6 +105,7 @@ main {
     border: none;
     border-radius: 6px;
     cursor: pointer;
+    touch-action: manipulation;
     transition: filter 0.15s;
 }
 #submit-btn:hover    { filter: brightness(1.2); }
