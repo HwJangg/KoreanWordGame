@@ -270,7 +270,14 @@ function buildKeyboard() {
                 key.id = 'key-' + jamo.codePointAt(0);
                 key.className = 'kb-key';
                 key.textContent = jamo;
-                key.addEventListener('pointerdown', e => { e.preventDefault(); if (!gameOver) imeInput(jamo); });
+                let lastPress = 0;
+                key.addEventListener('pointerdown', e => {
+                    e.preventDefault();
+                    const now = performance.now();
+                    if (now - lastPress < 180) return;
+                    lastPress = now;
+                    if (!gameOver) imeInput(jamo);
+                });
             }
             rowEl.appendChild(key);
         }
