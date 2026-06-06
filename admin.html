@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단어 관리</title>
+    <style>
+        :root {
+            --bg:     #121213;
+            --card:   #1e1e20;
+            --border: #3a3a3c;
+            --text:   #fff;
+            --gray:   #818384;
+            --green:  #538d4e;
+            --red:    #ff6b6b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 36px 16px;
+        }
+        h1 { font-size: 1.4rem; letter-spacing: 2px; margin-bottom: 6px; }
+        .subtitle { color: var(--gray); font-size: 0.78rem; margin-bottom: 28px; }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 12px;
+        }
+
+        label { display: block; font-size: 0.78rem; color: var(--gray); margin-bottom: 6px; }
+        input[type=text], input[type=password] {
+            width: 100%;
+            background: #2a2a3a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+            padding: 10px 12px;
+            outline: none;
+            font-family: inherit;
+        }
+        input:focus { border-color: var(--green); }
+        .input-group { margin-bottom: 14px; }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 9px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.9rem;
+        }
+        .info-row:last-child { border-bottom: none; }
+        .info-label { color: var(--gray); }
+        .info-value { font-weight: 700; font-size: 1rem; }
+
+        .jamo-hint { font-size: 0.78rem; margin-top: 5px; }
+        .ok  { color: var(--green); }
+        .err { color: var(--red); }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: filter 0.15s;
+            margin-top: 4px;
+        }
+        button:hover:not(:disabled) { filter: brightness(1.15); }
+        button:disabled { background: var(--border); cursor: default; }
+        .btn-sub { background: #3a3a3c; margin-top: 8px; font-size: 0.85rem; }
+
+        #log {
+            width: 100%;
+            max-width: 380px;
+            background: #0a0a14;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-family: 'Consolas', monospace;
+            font-size: 0.82rem;
+            color: #888;
+            min-height: 64px;
+            display: none;
+        }
+        #log div { margin-bottom: 3px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+<h1>오늘의 단어 관리</h1>
+<p class="subtitle">KoreanWordGame · 단어 업데이트</p>
+
+<!-- 토큰 입력 -->
+<div class="card" id="sec-token">
+    <div class="input-group">
+        <label>GitHub Personal Access Token</label>
+        <input type="password" id="token-input" placeholder="ghp_..." />
+    </div>
+    <button onclick="saveToken()">연결</button>
+</div>
+
+<!-- 현재 상태 -->
+<div class="card hidden" id="sec-info">
+    <div class="info-row">
+        <span class="info-label">현재 단어</span>
+        <span class="info-value" id="cur-word">—</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">최근 정답</span>
+        <span class="info-value" id="cur-last">—</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">업데이트 시간</span>
+        <span class="info-value" id="cur-time">—</span>
+    </div>
+</div>
+
+<!-- 업데이트 폼 -->
+<div class="card hidden" id="sec-form">
+    <div class="input-group">
+        <label>새 단어</label>
+        <input type="text" id="new-word" placeholder="한글 단어 입력" oninput="onWordInput()" />
+        <div class="jamo-hint" id="jamo-hint"></div>
+    </div>
+    <div class="input-group">
+        <label>업데이트 시간</label>
+        <input type="text" id="upd-time" />
+    </div>
+    <button id="submit-btn" onclick="doSubmit()">업데이트 &amp; 푸시</button>
+    <button class="btn-sub" onclick="clearToken()">토큰 초기화</button>
+</div>
+
+<div id="log"></div>
+
+<script>
+const OWNER  = 'HwJangg';
+const REPO   = 'KoreanWordGame';
+const FILE   = 'game.js';
+const BRANCH = 'master';
+
+// ── 자모 카운트 ──────────────────────────────────────────────────────────────
+const CHO_JAMO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const JUNG_JAMO = ['ㅏ','ㅏㅣ','ㅑ','ㅑㅣ','ㅓ','ㅓㅣ','ㅕ','ㅕㅣ','ㅗ','ㅗㅏ','ㅗㅏㅣ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅓㅣ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
+const JONG_JAMO = ['','ㄱ','ㄱㄱ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+function countJamo(text) {
+    let n = 0;
+    for (const ch of text) {
+        const code = ch.codePointAt(0);
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+            const off = code - 0xAC00;
+            n += CHO_JAMO[Math.floor(off / (21 * 28))].length;
+            n += JUNG_JAMO[Math.floor((off % (21 * 28)) / 28)].length;
+            n += JONG_JAMO[off % 28].length;
+        } else { n += 1; }
+    }
+    return n;
+}
+
+// ── GitHub API ───────────────────────────────────────────────────────────────
+async function apiGet(token) {
+    const r = await fetch(
+        `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}?ref=${BRANCH}&t=${Date.now()}`,
+        { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' } }
+    );
+    if (!r.ok) throw new Error(`인증 실패 (${r.status})`);
+    return r.json();
+}
+
+async function apiPut(token, content, sha, message) {
+    const bytes = new TextEncoder().encode(content);
+    let bin = '';
+    bytes.forEach(b => bin += String.fromCharCode(b));
+    const r = await fetch(
+        `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}`,
+        {
+            method: 'PUT',
+            headers: {
+                Authorization: `Bearer ${token}`,
+                Accept: 'application/vnd.github.v3+json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message, content: btoa(bin), sha, branch: BRANCH })
+        }
+    );
+    if (!r.ok) { const e = await r.json(); throw new Error(e.message || `오류 ${r.status}`); }
+    return r.json();
+}
+
+// ── 파싱 / 패치 ──────────────────────────────────────────────────────────────
+function parseValues(src) {
+    return {
+        word:    src.match(/const WORDS = \[[\s\S]*?'([^']+)'/)?.[1] ?? '',
+        last:    src.match(/LAST_ANSWER\s*=\s*'([^']+)'/)?.[1] ?? '',
+        updated: src.match(/WORDS_UPDATED = '([^']+)'/)?.[1] ?? '',
+    };
+}
+
+function patchContent(src, newWord, lastAnswer, updTime) {
+    src = src.replace(/WORDS_UPDATED = '[^']+'/, `WORDS_UPDATED = '${updTime}'`);
+    src = src.replace(/(LAST_ANSWER\s*=\s*)'[^']+'/, `$1'${lastAnswer}'`);
+    src = src.replace(/(const WORDS = \[)[\s\S]*?(\];)/, `$1\n    '${newWord}',\n$2`);
+    return src;
+}
+
+// ── UI 헬퍼 ─────────────────────────────────────────────────────────────────
+function addLog(msg, cls = '') {
+    const el = document.getElementById('log');
+    el.style.display = 'block';
+    const d = document.createElement('div');
+    d.className = cls; d.textContent = msg;
+    el.appendChild(d);
+    el.scrollTop = el.scrollHeight;
+}
+
+function nowPlusOne() {
+    const d = new Date(Date.now() + 60000);
+    const p = n => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+function decodeContent(b64) {
+    const bin   = atob(b64.replace(/\n/g, ''));
+    const bytes = Uint8Array.from(bin, c => c.charCodeAt(0));
+    return new TextDecoder().decode(bytes);
+}
+
+function onWordInput() {
+    const word = document.getElementById('new-word').value.trim();
+    const hint = document.getElementById('jamo-hint');
+    if (!word) { hint.textContent = ''; return; }
+    const n = countJamo(word);
+    hint.textContent = `자모 ${n}개`;
+    hint.className = 'jamo-hint ' + (n === 5 ? 'ok' : 'err');
+}
+
+// ── 토큰 저장 / 로드 ─────────────────────────────────────────────────────────
+async function saveToken() {
+    const token = document.getElementById('token-input').value.trim();
+    if (!token) return;
+    addLog('연결 중...');
+    try {
+        const data = await apiGet(token);
+        const src  = decodeContent(data.content);
+        const vals = parseValues(src);
+
+        localStorage.setItem('gh_token', token);
+
+        document.getElementById('cur-word').textContent = vals.word;
+        document.getElementById('cur-last').textContent = vals.last;
+        document.getElementById('cur-time').textContent = vals.updated;
+        document.getElementById('upd-time').value = nowPlusOne();
+
+        document.getElementById('sec-token').classList.add('hidden');
+        document.getElementById('sec-info').classList.remove('hidden');
+        document.getElementById('sec-form').classList.remove('hidden');
+        addLog('✓ 연결 완료', 'ok');
+    } catch(e) {
+        addLog(`✗ ${e.message}`, 'err');
+    }
+}
+
+function clearToken() {
+    localStorage.removeItem('gh_token');
+    location.reload();
+}
+
+// ── 업데이트 제출 ────────────────────────────────────────────────────────────
+async function doSubmit() {
+    const newWord = document.getElementById('new-word').value.trim();
+    const updTime = document.getElementById('upd-time').value.trim();
+    if (!newWord) { alert('새 단어를 입력하세요.'); return; }
+    const n = countJamo(newWord);
+    if (n !== 5 && !confirm(`자모가 ${n}개입니다 (5개 필요). 계속할까요?`)) return;
+
+    const token   = localStorage.getItem('gh_token');
+    const oldWord = document.getElementById('cur-word').textContent;
+    const btn     = document.getElementById('submit-btn');
+    btn.disabled = true; btn.textContent = '처리 중...';
+
+    try {
+        const fresh   = await apiGet(token);
+        const src     = decodeContent(fresh.content);
+        const patched = patchContent(src, newWord, oldWord, updTime);
+
+        await apiPut(token, patched, fresh.sha, `단어 ${newWord}, 시간 ${updTime}`);
+
+        addLog(`✓ 완료! 단어: ${newWord}`, 'ok');
+        document.getElementById('cur-last').textContent = oldWord;
+        document.getElementById('cur-word').textContent = newWord;
+        document.getElementById('cur-time').textContent = updTime;
+        document.getElementById('new-word').value = '';
+        document.getElementById('jamo-hint').textContent = '';
+        document.getElementById('upd-time').value = nowPlusOne();
+    } catch(e) {
+        addLog(`✗ ${e.message}`, 'err');
+    } finally {
+        btn.disabled = false; btn.textContent = '업데이트 & 푸시';
+    }
+}
+
+// ── 자동 로그인 ──────────────────────────────────────────────────────────────
+window.onload = () => {
+    const token = localStorage.getItem('gh_token');
+    if (token) {
+        document.getElementById('token-input').value = token;
+        saveToken();
+    }
+};
+</script>
+</body>
+</html>
