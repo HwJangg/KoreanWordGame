@@ -1,9 +1,9 @@
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
-const WORDS_UPDATED = '2026-06-07 07:46';
-const LAST_ANSWER   = '아침';
+const WORDS_UPDATED = '2026-06-07 08:02';
+const LAST_ANSWER   = '자칼';
 const WORDS = [
-    '자칼',
+    '기준',
 ];
 
 const MAX = 5;
