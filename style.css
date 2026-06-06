@@ -189,5 +189,5 @@ main {
 @media (max-width: 400px) {
     .cell { width: 52px; height: 52px; font-size: 1.25rem; }
     #guess-input { width: 150px; }
-    .kb-key { height: 46px; font-size: 0.95rem; }
+    .kb-key { height: 46px; font-size: 1rem; }
 }
