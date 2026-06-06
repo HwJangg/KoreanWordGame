@@ -111,6 +111,24 @@ main {
 #submit-btn:hover    { filter: brightness(1.2); }
 #submit-btn:disabled { background: var(--border); cursor: default; filter: none; }
 
+#restart-btn {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    padding: 12px;
+    margin-top: 6px;
+    font-size: 1rem;
+    font-weight: 700;
+    background: #555;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+    transition: filter 0.15s;
+}
+#restart-btn:hover { filter: brightness(1.2); }
+
 /* ── Message ── */
 #message {
     min-height: 20px;
