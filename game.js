@@ -139,6 +139,7 @@ function imeDisplay() {
 }
 
 function imeInput(jamo) {
+    if (imeJamo().length >= 5) return;
     const s = ime;
     if (jamo in JUNG_IDX) {
         // 모음
