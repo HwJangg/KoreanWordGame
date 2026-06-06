@@ -1,6 +1,7 @@
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
 const WORDS_UPDATED = '2026-06-07 02:50';
+const LAST_ANSWER   = '수면';
 const WORDS = [
     '라면',
 ];
@@ -426,6 +427,7 @@ function init() {
     cacheCells();
     imeReset();
     setMsg('');
+    document.getElementById('recent-answer').textContent = '최근 정답: ' + LAST_ANSWER;
     document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
     updateCurrentRow();
 }
