@@ -337,7 +337,7 @@ function buildKeyboard() {
                         if (gameOver) return;
                         imeBackspace();
                         bsRepeat = setTimeout(repeat, 35);
-                    }, 30);
+                    }, 400);
                 });
                 const stopBs = () => { clearTimeout(bsRepeat); bsRepeat = null; };
                 key.addEventListener('pointerup', stopBs);
@@ -348,13 +348,20 @@ function buildKeyboard() {
                 key.className = 'kb-key';
                 key.textContent = jamo;
                 let lastPress = 0;
+                let acceptTimer = null;
                 key.addEventListener('pointerdown', e => {
                     e.preventDefault();
                     const now = performance.now();
                     if (now - lastPress < 180) return;
                     lastPress = now;
-                    if (!gameOver) imeInput(jamo);
+                    acceptTimer = setTimeout(() => {
+                        if (!gameOver) imeInput(jamo);
+                    }, 30);
                 });
+                const cancelAccept = () => { clearTimeout(acceptTimer); acceptTimer = null; };
+                key.addEventListener('pointerup', cancelAccept);
+                key.addEventListener('pointercancel', cancelAccept);
+                key.addEventListener('pointerleave', cancelAccept);
             }
             rowEl.appendChild(key);
         }
