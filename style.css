@@ -163,6 +163,7 @@ header p {
 .kb-key.green  { background: var(--green); }
 .kb-key.yellow { background: var(--yellow); }
 .kb-key.gray   { background: var(--gray); }
+.kb-back { background: #555; max-width: 52px; font-size: 1.1rem; }
 
 /* ── Mobile ── */
 @media (max-width: 400px) {

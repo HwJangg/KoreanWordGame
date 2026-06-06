@@ -105,10 +105,122 @@ function judge(ans, guess) {
     return gJamo.map((jamo, i) => ({ jamo, color: colors[i] }));
 }
 
+// ── 한글 IME ──────────────────────────────────────────────────────────────
+
+const CHO_IDX  = {ㄱ:0,ㄲ:1,ㄴ:2,ㄷ:3,ㄸ:4,ㄹ:5,ㅁ:6,ㅂ:7,ㅃ:8,ㅅ:9,ㅆ:10,ㅇ:11,ㅈ:12,ㅉ:13,ㅊ:14,ㅋ:15,ㅌ:16,ㅍ:17,ㅎ:18};
+const JUNG_IDX = {ㅏ:0,ㅐ:1,ㅑ:2,ㅒ:3,ㅓ:4,ㅔ:5,ㅕ:6,ㅖ:7,ㅗ:8,ㅘ:9,ㅙ:10,ㅚ:11,ㅛ:12,ㅜ:13,ㅝ:14,ㅞ:15,ㅟ:16,ㅠ:17,ㅡ:18,ㅢ:19,ㅣ:20};
+const JONG_IDX = {ㄱ:1,ㄲ:2,ㄴ:4,ㄷ:7,ㄹ:8,ㅁ:16,ㅂ:17,ㅅ:19,ㅆ:20,ㅇ:21,ㅈ:22,ㅊ:23,ㅋ:24,ㅌ:25,ㅍ:26,ㅎ:27};
+const JONG_TO_CHO = {1:0,2:1,4:2,7:3,8:5,16:6,17:7,19:9,20:10,21:11,22:12,23:14,24:15,25:16,26:17,27:18};
+// 겹받침: jong1+jong2 → compound
+const CJONG = {'1,19':3,'4,22':5,'4,27':6,'8,1':9,'8,16':10,'8,17':11,'8,19':12,'8,25':13,'8,26':14,'8,27':15,'17,19':18};
+// 겹받침 분리: compound → [first, second]
+const SJONG = {3:[1,19],5:[4,22],6:[4,27],9:[8,1],10:[8,16],11:[8,17],12:[8,19],13:[8,25],14:[8,26],15:[8,27],18:[17,19]};
+// 겹모음: jung_idx+vowel → compound jung
+const CJUNG = {'8,ㅏ':9,'8,ㅐ':10,'8,ㅣ':11,'13,ㅓ':14,'13,ㅔ':15,'13,ㅣ':16,'18,ㅣ':19};
+// 겹모음 분리: compound jung → first jung
+const SJUNG = {9:8,10:8,11:8,14:13,15:13,16:13,19:18};
+const CHO_CHARS = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+let ime = { done: '', cho: -1, jung: -1, jong: 0 };
+
+function makeSyl(cho, jung, jong) {
+    return String.fromCharCode(0xAC00 + (cho * 21 + jung) * 28 + jong);
+}
+
+function imeDisplay() {
+    const { done, cho, jung, jong } = ime;
+    if (cho < 0) return done;
+    if (jung < 0) return done + CHO_CHARS[cho];
+    return done + makeSyl(cho, jung, jong);
+}
+
+function imeInput(jamo) {
+    const s = ime;
+    if (jamo in JUNG_IDX) {
+        // 모음
+        const vc = JUNG_IDX[jamo];
+        if (s.cho < 0) {
+            s.cho = 11; s.jung = vc; // 묵음 ㅇ + 모음
+        } else if (s.jung < 0) {
+            s.jung = vc;
+        } else if (s.jong === 0) {
+            const comp = CJUNG[s.jung + ',' + jamo];
+            if (comp !== undefined) {
+                s.jung = comp; // 겹모음 합성
+            } else {
+                s.done += makeSyl(s.cho, s.jung, 0);
+                s.cho = 11; s.jung = vc; s.jong = 0;
+            }
+        } else {
+            // 받침이 있을 때 모음 → 받침을 다음 음절 초성으로
+            const split = SJONG[s.jong];
+            if (split) {
+                s.done += makeSyl(s.cho, s.jung, split[0]);
+                s.cho = JONG_TO_CHO[split[1]];
+            } else {
+                s.done += makeSyl(s.cho, s.jung, 0);
+                s.cho = JONG_TO_CHO[s.jong];
+            }
+            s.jung = vc; s.jong = 0;
+        }
+    } else {
+        // 자음
+        const cc = CHO_IDX[jamo];
+        const jc = JONG_IDX[jamo] || 0;
+        if (s.cho < 0) {
+            s.cho = cc;
+        } else if (s.jung < 0) {
+            s.done += CHO_CHARS[s.cho];
+            s.cho = cc; s.jong = 0;
+        } else if (s.jong === 0) {
+            if (jc > 0) s.jong = jc;
+            else { s.done += makeSyl(s.cho, s.jung, 0); s.cho = cc; s.jung = -1; s.jong = 0; }
+        } else {
+            const comp = CJONG[s.jong + ',' + jc];
+            if (comp) {
+                s.jong = comp; // 겹받침 합성
+            } else {
+                s.done += makeSyl(s.cho, s.jung, s.jong);
+                s.cho = cc; s.jung = -1; s.jong = 0;
+            }
+        }
+    }
+    document.getElementById('guess-input').value = imeDisplay();
+}
+
+function imeBackspace() {
+    const s = ime;
+    if (s.jong > 0) {
+        const split = SJONG[s.jong];
+        s.jong = split ? split[0] : 0;
+    } else if (s.jung >= 0) {
+        const prev = SJUNG[s.jung];
+        s.jung = prev !== undefined ? prev : -1;
+    } else if (s.cho >= 0) {
+        s.cho = -1;
+    } else if (s.done.length > 0) {
+        const last = s.done[s.done.length - 1];
+        s.done = s.done.slice(0, -1);
+        const code = last.codePointAt(0);
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+            const off = code - 0xAC00;
+            s.cho = Math.floor(off / (21 * 28));
+            s.jung = Math.floor((off % (21 * 28)) / 28);
+            s.jong = off % 28;
+        }
+    }
+    document.getElementById('guess-input').value = imeDisplay();
+}
+
+function imeReset() {
+    ime = { done: '', cho: -1, jung: -1, jong: 0 };
+    document.getElementById('guess-input').value = '';
+}
+
 // ── 키보드 ────────────────────────────────────────────────────────────────
 
 const KEYBOARD_ROWS = [
-    ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ'],
+    ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','←'],
     ['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'],
     ['ㅊ','ㅋ','ㅌ','ㅍ','ㅠ','ㅜ','ㅡ'],
 ];
@@ -123,9 +235,16 @@ function buildKeyboard() {
         rowEl.className = 'kb-row';
         for (const jamo of row) {
             const key = document.createElement('div');
-            key.id = 'key-' + jamo.codePointAt(0);
-            key.className = 'kb-key';
-            key.textContent = jamo;
+            if (jamo === '←') {
+                key.className = 'kb-key kb-back';
+                key.textContent = '←';
+                key.addEventListener('click', () => { if (!gameOver) imeBackspace(); });
+            } else {
+                key.id = 'key-' + jamo.codePointAt(0);
+                key.className = 'kb-key';
+                key.textContent = jamo;
+                key.addEventListener('click', () => { if (!gameOver) imeInput(jamo); });
+            }
             rowEl.appendChild(key);
         }
         kb.appendChild(rowEl);
@@ -180,9 +299,8 @@ function setMsg(text, type = '') {
 
 function submit() {
     if (gameOver) return;
-    const input = document.getElementById('guess-input');
-    const guess = input.value.trim();
-    input.value = '';
+    const guess = imeDisplay().trim();
+    imeReset();
     if (!guess) return;
 
     const err = validateGuess(guess);
@@ -218,12 +336,12 @@ function init() {
 
     buildBoard();
     buildKeyboard();
+    imeReset();
     setMsg('');
     document.getElementById('submit-btn').disabled = false;
     document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
 
     const input = document.getElementById('guess-input');
-    input.focus();
     input.onkeydown = e => { if (e.key === 'Enter') submit(); };
     document.getElementById('submit-btn').onclick = submit;
 }
