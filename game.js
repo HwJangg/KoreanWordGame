@@ -105,6 +105,45 @@ function judge(ans, guess) {
     return gJamo.map((jamo, i) => ({ jamo, color: colors[i] }));
 }
 
+// ── 키보드 ────────────────────────────────────────────────────────────────
+
+const KEYBOARD_ROWS = [
+    ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ'],
+    ['ㅁ','ㄴ','ㅇ','ㄹ','ㅎ','ㅗ','ㅓ','ㅏ','ㅣ'],
+    ['ㅊ','ㅋ','ㅌ','ㅍ','ㅠ','ㅜ','ㅡ'],
+];
+
+let jamoState = {};
+
+function buildKeyboard() {
+    const kb = document.getElementById('keyboard');
+    kb.innerHTML = '';
+    for (const row of KEYBOARD_ROWS) {
+        const rowEl = document.createElement('div');
+        rowEl.className = 'kb-row';
+        for (const jamo of row) {
+            const key = document.createElement('div');
+            key.id = 'key-' + jamo.codePointAt(0);
+            key.className = 'kb-key';
+            key.textContent = jamo;
+            rowEl.appendChild(key);
+        }
+        kb.appendChild(rowEl);
+    }
+}
+
+function updateKeyboard(result) {
+    const priority = { green: 3, yellow: 2, gray: 1 };
+    for (const { jamo, color } of result) {
+        const cur = jamoState[jamo];
+        if (!cur || (priority[color] || 0) > (priority[cur] || 0)) {
+            jamoState[jamo] = color;
+            const el = document.getElementById('key-' + jamo.codePointAt(0));
+            if (el) el.className = 'kb-key ' + color;
+        }
+    }
+}
+
 // ── DOM ───────────────────────────────────────────────────────────────────
 
 function buildBoard() {
@@ -152,6 +191,7 @@ function submit() {
     setMsg('');
     const result = judge(answer, guess);
     reveal(attempt, result);
+    updateKeyboard(result);
     attempt++;
 
     const won = result.every(r => r.color === 'green');
@@ -174,8 +214,10 @@ function init() {
     answerKeys = koreanToKeys(answer);
     attempt   = 0;
     gameOver  = false;
+    jamoState = {};
 
     buildBoard();
+    buildKeyboard();
     setMsg('');
     document.getElementById('submit-btn').disabled = false;
     document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
