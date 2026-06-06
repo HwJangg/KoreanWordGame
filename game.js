@@ -243,6 +243,7 @@ function updateCurrentRow() {
         cell.textContent = jamo[c] || '';
         cell.className = jamo[c] ? 'cell preview' : 'cell';
     }
+    document.getElementById('keyboard').classList.toggle('kb-full', jamo.length >= 5);
 }
 
 // ── 키보드 ────────────────────────────────────────────────────────────────

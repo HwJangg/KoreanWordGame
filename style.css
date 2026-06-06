@@ -161,6 +161,11 @@ main {
 .kb-key.gray   { background: var(--gray); }
 .kb-back { background: #555; max-width: 64px; font-size: 1.2rem; }
 
+#keyboard.kb-full .kb-key:not(.kb-back) {
+    pointer-events: none;
+    opacity: 0.35;
+}
+
 /* ── Mobile ── */
 @media (max-width: 400px) {
     .cell { width: 52px; height: 52px; font-size: 1.25rem; }
