@@ -47,6 +47,15 @@ header p {
     margin-top: 2px;
 }
 
+main {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 6px;
+}
+
 /* ── Board ── */
 #board {
     display: flex;
@@ -142,13 +151,15 @@ header p {
     align-items: center;
     justify-content: center;
     user-select: none;
+    cursor: pointer;
+    touch-action: manipulation;
     transition: background 0.2s;
 }
 
 .kb-key.green  { background: var(--green); }
 .kb-key.yellow { background: var(--yellow); }
 .kb-key.gray   { background: var(--gray); }
-.kb-back { background: #555; max-width: 52px; font-size: 1.1rem; }
+.kb-back { background: #555; max-width: 64px; font-size: 1.2rem; }
 
 /* ── Mobile ── */
 @media (max-width: 400px) {

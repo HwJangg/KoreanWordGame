@@ -260,13 +260,13 @@ function buildKeyboard() {
             const key = document.createElement('div');
             if (jamo === '←') {
                 key.className = 'kb-key kb-back';
-                key.textContent = '←';
-                key.addEventListener('click', () => { if (!gameOver) imeBackspace(); });
+                key.textContent = '⌫';
+                key.addEventListener('pointerdown', e => { e.preventDefault(); if (!gameOver) imeBackspace(); });
             } else {
                 key.id = 'key-' + jamo.codePointAt(0);
                 key.className = 'kb-key';
                 key.textContent = jamo;
-                key.addEventListener('click', () => { if (!gameOver) imeInput(jamo); });
+                key.addEventListener('pointerdown', e => { e.preventDefault(); if (!gameOver) imeInput(jamo); });
             }
             rowEl.appendChild(key);
         }
