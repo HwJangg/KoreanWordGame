@@ -383,5 +383,18 @@ function init() {
     document.getElementById('submit-btn').onclick = submit;
 }
 
+const DUBEOLSIK = {
+    q:'ㅂ',w:'ㅈ',e:'ㄷ',r:'ㄱ',t:'ㅅ',y:'ㅛ',u:'ㅕ',i:'ㅑ',o:'ㅐ',p:'ㅔ',
+    a:'ㅁ',s:'ㄴ',d:'ㅇ',f:'ㄹ',g:'ㅎ',h:'ㅗ',j:'ㅓ',k:'ㅏ',l:'ㅣ',
+    z:'ㅋ',x:'ㅌ',c:'ㅊ',v:'ㅍ',b:'ㅠ',n:'ㅜ',m:'ㅡ',
+    Q:'ㅃ',W:'ㅉ',E:'ㄸ',R:'ㄲ',T:'ㅆ',O:'ㅒ',P:'ㅖ'
+};
+
 document.addEventListener('DOMContentLoaded', init);
-document.addEventListener('keydown', e => { if (e.key === 'Enter') submit(); });
+document.addEventListener('keydown', e => {
+    if (gameOver) return;
+    if (e.key === 'Enter') { submit(); return; }
+    if (e.key === 'Backspace') { e.preventDefault(); imeBackspace(); return; }
+    const jamo = DUBEOLSIK[e.key];
+    if (jamo) { e.preventDefault(); imeInput(jamo); }
+});
