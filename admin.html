@@ -162,7 +162,7 @@
 <script>
 const OWNER  = 'HwJangg';
 const REPO   = 'KoreanWordGame';
-const FILE   = 'game.js';
+const FILE   = 'word.json';
 const BRANCH = 'master';
 const TOKEN  = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,78,76,51,85,79,65,48,104,97,80,112,112,100,102,110,73,109,105,82,95,88,87,105,121,114,107,107,84,49,50,71,117,114,104,71,103,116,76,48,119,82,115,101,67,112,112,48,122,54,55,52,112,105,122,106,79,74,112,100,100,75,48,100,90,68,86,68,76,81,67,73,57,85,75,86,84,55,86,86].map(c=>String.fromCharCode(c)).join('');
 const PW     = '1234';
@@ -218,18 +218,16 @@ async function apiPut(content, sha, message) {
 
 // ── 파싱 / 패치 ──────────────────────────────────────────────────────────────
 function parseValues(src) {
-    return {
-        word:    src.match(/const WORDS = \[[\s\S]*?'([^']+)'/)?.[1] ?? '',
-        last:    src.match(/LAST_ANSWER\s*=\s*'([^']+)'/)?.[1] ?? '',
-        updated: src.match(/WORDS_UPDATED = '([^']+)'/)?.[1] ?? '',
-    };
+    const d = JSON.parse(src);
+    return { word: d.word, last: d.last, updated: d.updated };
 }
 
 function patchContent(src, newWord, lastAnswer, updTime) {
-    src = src.replace(/WORDS_UPDATED = '[^']+'/, `WORDS_UPDATED = '${updTime}'`);
-    src = src.replace(/(LAST_ANSWER\s*=\s*)'[^']+'/, `$1'${lastAnswer}'`);
-    src = src.replace(/(const WORDS = \[)[\s\S]*?(\];)/, `$1\n    '${newWord}',\n$2`);
-    return src;
+    const d = JSON.parse(src);
+    d.word    = newWord;
+    d.last    = lastAnswer;
+    d.updated = updTime;
+    return JSON.stringify(d, null, 2) + '\n';
 }
 
 // ── UI 헬퍼 ─────────────────────────────────────────────────────────────────

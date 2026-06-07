@@ -1,11 +1,5 @@
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
-const WORDS_UPDATED = '2026-06-07 11:37';
-const LAST_ANSWER   = '재미';
-const WORDS = [
-    '표창',
-];
-
 const MAX = 5;
 
 // 자모 표시 문자 (CHO/JUNG/JONG_KEYS와 인덱스·글자수 1:1 대응)
@@ -414,9 +408,11 @@ function submit() {
     }, 4 * 130 + 400);
 }
 
-function init() {
-    const day = Math.floor((Date.now() - new Date('2024-01-01').getTime()) / 86400000);
-    answer   = WORDS[day % WORDS.length];
+async function init() {
+    const res  = await fetch('word.json?v=' + Date.now(), { cache: 'no-store' });
+    const data = await res.json();
+
+    answer   = data.word;
     attempt  = 0;
     gameOver = false;
     jamoState = {};
@@ -434,8 +430,8 @@ function init() {
     cacheCells();
     imeReset();
     setMsg('');
-    document.getElementById('recent-answer').textContent = '최근 정답: ' + LAST_ANSWER;
-    document.getElementById('words-updated').textContent = '단어 업데이트: ' + WORDS_UPDATED;
+    document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
+    document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
     updateCurrentRow();
 }
 

@@ -1,14 +1,23 @@
+import sys
 import tkinter as tk
 from tkinter import messagebox
-import re
+import json
 import subprocess
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 
-SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-GAME_JS    = os.path.join(SCRIPT_DIR, 'game.js')
+if getattr(sys, 'frozen', False):
+    _exe_dir = os.path.dirname(sys.executable)
+    if os.path.exists(os.path.join(_exe_dir, 'word.json')):
+        SCRIPT_DIR = _exe_dir
+    else:
+        SCRIPT_DIR = os.path.dirname(_exe_dir)
+else:
+    SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 
-# game.js의 CHO/JUNG/JONG_JAMO와 동일 — 자모 수 계산용
+WORD_JSON = os.path.join(SCRIPT_DIR, 'word.json')
+
+# CHO/JUNG/JONG_JAMO — 자모 수 계산용
 CHO_JAMO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ']
 JUNG_JAMO = ['ㅏ','ㅏㅣ','ㅑ','ㅑㅣ','ㅓ','ㅓㅣ','ㅕ','ㅕㅣ','ㅗ','ㅗㅏ','ㅗㅏㅣ','ㅗㅣ','ㅛ',
              'ㅜ','ㅜㅓ','ㅜㅓㅣ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ']
@@ -29,28 +38,19 @@ def count_jamo(text):
     return n
 
 def read_values():
-    with open(GAME_JS, encoding='utf-8') as f:
-        content = f.read()
-    word    = re.search(r"const WORDS = \[[\s\S]*?'([^']+)'", content)
-    last    = re.search(r"LAST_ANSWER\s*=\s*'([^']+)'", content)
-    updated = re.search(r"WORDS_UPDATED = '([^']+)'", content)
-    return (
-        word.group(1)    if word    else '',
-        last.group(1)    if last    else '',
-        updated.group(1) if updated else '',
-    )
+    with open(WORD_JSON, encoding='utf-8') as f:
+        d = json.load(f)
+    return d.get('word', ''), d.get('last', ''), d.get('updated', '')
 
-def write_game_js(new_word, last_answer, upd_time):
-    with open(GAME_JS, encoding='utf-8') as f:
-        content = f.read()
-    content = re.sub(r"WORDS_UPDATED = '[^']+'",
-                     f"WORDS_UPDATED = '{upd_time}'", content)
-    content = re.sub(r"LAST_ANSWER(\s*)= '[^']+'",
-                     f"LAST_ANSWER\\1= '{last_answer}'", content)
-    content = re.sub(r"(const WORDS = \[)[\s\S]*?(\];)",
-                     f"\\1\n    '{new_word}',\n\\2", content)
-    with open(GAME_JS, 'w', encoding='utf-8') as f:
-        f.write(content)
+def write_word_json(new_word, last_answer, upd_time):
+    with open(WORD_JSON, encoding='utf-8') as f:
+        d = json.load(f)
+    d['word']    = new_word
+    d['last']    = last_answer
+    d['updated'] = upd_time
+    with open(WORD_JSON, 'w', encoding='utf-8') as f:
+        json.dump(d, f, ensure_ascii=False, indent=2)
+        f.write('\n')
 
 
 class App(tk.Tk):
@@ -127,7 +127,6 @@ class App(tk.Tk):
 
     def _refresh_time(self):
         self.ent_time.delete(0, 'end')
-        from datetime import timedelta
         self.ent_time.insert(0, (datetime.now() + timedelta(minutes=1)).strftime('%Y-%m-%d %H:%M'))
 
     def _on_word_change(self, _=None):
@@ -160,14 +159,18 @@ class App(tk.Tk):
                 return
 
         old_word = self.lbl_cur.cget('text')
+        # 버튼 누른 시점의 시간+1분으로 덮어쓰기
+        self.ent_time.delete(0, 'end')
+        self.ent_time.insert(0, (datetime.now() + timedelta(minutes=1)).strftime('%Y-%m-%d %H:%M'))
+        upd_time = self.ent_time.get().strip()
         self.btn.config(state='disabled', text='처리 중...')
         self.update()
 
         try:
-            write_game_js(new_word, old_word, upd_time)
-            self._log('✓ game.js 수정')
+            write_word_json(new_word, old_word, upd_time)
+            self._log('✓ word.json 수정')
 
-            subprocess.run(['git', 'add', 'game.js'],
+            subprocess.run(['git', 'add', 'word.json'],
                            cwd=SCRIPT_DIR, check=True, capture_output=True)
             commit_msg = f'단어 {new_word}, 시간 {upd_time}'
             subprocess.run(['git', 'commit', '-m', commit_msg],
