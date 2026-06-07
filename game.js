@@ -1,9 +1,9 @@
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
-const WORDS_UPDATED = '2026-06-07 11:33';
-const LAST_ANSWER   = '표창';
+const WORDS_UPDATED = '2026-06-07 11:37';
+const LAST_ANSWER   = '재미';
 const WORDS = [
-    '재미',
+    '표창',
 ];
 
 const MAX = 5;
