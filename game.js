@@ -81,7 +81,7 @@ function _loadGame() {
         const s = JSON.parse(localStorage.getItem(_saveKey));
         if (!s || !Array.isArray(s.history) || s.history.length === 0) return false;
         if (s.date !== _today()) { localStorage.removeItem(_saveKey); return false; }
-        s.history.forEach((result, i) => { reveal(i, result); updateKeyboard(result); });
+        s.history.forEach((result, i) => { reveal(i, result, true); updateKeyboard(result); });
         gameHistory = s.history;
         attempt = s.attempt;
         gameOver = s.gameOver;
@@ -335,13 +335,15 @@ function buildBoard() {
     }
 }
 
-function reveal(row, result) {
+function reveal(row, result, instant = false) {
     result.forEach(({ jamo, color }, col) => {
-        setTimeout(() => {
+        const apply = () => {
             const cell = document.getElementById(`c${row}${col}`);
             cell.textContent = jamo;
             cell.className = 'cell filled ' + color;
-        }, col * 130);
+        };
+        if (instant) apply();
+        else setTimeout(apply, col * 130);
     });
 }
 
@@ -487,6 +489,32 @@ function submit() {
     }, 4 * 130 + 400);
 }
 
+function _injectRules() {
+    const header = document.querySelector('header');
+    if (header) {
+        const btn = document.createElement('button');
+        btn.className = 'rules-btn';
+        btn.textContent = '?';
+        btn.onclick = () => { document.getElementById('rules-modal').style.display = 'flex'; };
+        header.appendChild(btn);
+    }
+    const modal = document.createElement('div');
+    modal.id = 'rules-modal';
+    modal.className = 'modal-overlay';
+    modal.style.display = 'none';
+    modal.innerHTML = `
+        <div class="modal-box">
+            <button class="modal-close" onclick="document.getElementById('rules-modal').style.display='none'">✕</button>
+            <h2>게임 규칙</h2>
+            <p class="modal-desc">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 자모의 색으로 힌트를 확인하세요.</p>
+            <div class="rule-item"><span class="rule-tile green">ㅏ</span> 정확한 자리의 자모</div>
+            <div class="rule-item"><span class="rule-tile yellow">ㄱ</span> 단어에 있지만 자리가 다른 자모</div>
+            <div class="rule-item"><span class="rule-tile gray">ㅎ</span> 단어에 없는 자모</div>
+        </div>`;
+    modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+    document.body.appendChild(modal);
+}
+
 function init() {
     attempt  = 0;
     gameOver = false;
@@ -503,6 +531,7 @@ function init() {
     const makeBtn = document.getElementById('make-btn');
     if (makeBtn) makeBtn.style.display = 'none';
 
+    _injectRules();
     buildBoard();
     buildKeyboard();
     cacheCells();
