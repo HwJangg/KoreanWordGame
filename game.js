@@ -468,7 +468,7 @@ function init() {
 
     function showInvalidLink() {
         setMsg('잘못된 도전장 주소입니다.', 'error');
-        document.getElementById('message').style.marginTop = '28px';
+        document.getElementById('message').style.marginTop = '12px';
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
         document.getElementById('board').style.display = 'none';
