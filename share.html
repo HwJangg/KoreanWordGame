@@ -195,6 +195,8 @@ window.onWordInput = function() {
 
 window.generateLink = function() {
     const word = document.getElementById('word-input').value.trim();
+    const isKoreanOnly = [...word].every(ch => { const c = ch.codePointAt(0); return c >= 0xAC00 && c <= 0xD7A3; });
+    if (!isKoreanOnly || countJamo(word) !== 5) return;
     const encoded = encodeWord(word);
     const url = location.origin + location.pathname + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;

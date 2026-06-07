@@ -447,6 +447,7 @@ function init() {
     updateCurrentRow();
 
     const shareWord = getShareWord();
+    const hasShareParam = !!new URLSearchParams(location.search).get('w');
     if (shareWord) {
         answer = shareWord;
         $submitBtn.onclick  = submit;
@@ -455,6 +456,10 @@ function init() {
         const wu = document.getElementById('words-updated');
         if (ra) ra.textContent = '';
         if (wu) wu.textContent = '공유 게임';
+    } else if (hasShareParam) {
+        setMsg('잘못된 공유 링크입니다', 'error');
+        const wu = document.getElementById('words-updated');
+        if (wu) wu.textContent = '';
     } else {
         fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
             .then(r => r.json())
