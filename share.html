@@ -123,6 +123,10 @@
 <script>
 (function() {
 const _KEY = 42;
+let _dictSet = null;
+fetch('dict.json', { cache: 'force-cache' })
+    .then(r => r.json())
+    .then(data => { _dictSet = new Set(data); });
 const _CHO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 const _JUNG = ['ㅏ','ㅏㅣ','ㅑ','ㅑㅣ','ㅓ','ㅓㅣ','ㅕ','ㅕㅣ','ㅗ','ㅗㅏ','ㅗㅏㅣ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅓㅣ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
 const _JONG = ['','ㄱ','ㄱㄱ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
@@ -164,15 +168,28 @@ window.onWordInput = function() {
         return;
     }
     const n = countJamo(word);
+    if (n !== 5) {
+        hint.textContent = `자모 ${n}개`;
+        hint.className = 'jamo-hint err';
+        btn.disabled = true;
+        return;
+    }
+    if (_dictSet && !_dictSet.has(word)) {
+        hint.textContent = '사전에 없는 단어입니다';
+        hint.className = 'jamo-hint err';
+        btn.disabled = true;
+        return;
+    }
     hint.textContent = `자모 ${n}개`;
-    hint.className = 'jamo-hint ' + (n === 5 ? 'ok' : 'err');
-    btn.disabled = (n !== 5);
+    hint.className = 'jamo-hint ok';
+    btn.disabled = false;
 };
 
 window.generateLink = function() {
     const word = document.getElementById('word-input').value.trim();
     const isKoreanOnly = [...word].every(ch => { const c = ch.codePointAt(0); return c >= 0xAC00 && c <= 0xD7A3; });
     if (!isKoreanOnly || countJamo(word) !== 5) return;
+    if (_dictSet && !_dictSet.has(word)) return;
     const encoded = encodeWord(word);
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;

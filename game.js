@@ -58,6 +58,7 @@ const SCHO = {1:0,4:3,8:7,10:9,13:12};
 let answer, attempt, gameOver;
 let jamoState = {};
 let ime = { done: '', cho: -1, jung: -1, jong: 0 };
+let wordSet = null;
 
 // DOM 캐시
 let $submitBtn, $restartBtn, $keyboard, $cells = [];
@@ -94,6 +95,9 @@ function validateGuess(guess) {
 
     if (dubeolKeys.length !== 5)
         return `자모 ${dubeolKeys.length}개 (5개 필요)`;
+
+    if (wordSet && !wordSet.has(guess))
+        return '사전에 없는 단어입니다';
 
     if (VOWEL_CHARS.has(dubeolKeys[0]))
         return '모음으로 시작할 수 없습니다';
@@ -454,17 +458,15 @@ function init() {
     setMsg('');
     updateCurrentRow();
 
+    // 사전 로드 (비동기, 추측 제출 전까지만 완료되면 됨)
+    fetch('dict.json', { cache: 'force-cache' })
+        .then(r => r.json())
+        .then(data => { wordSet = new Set(data); });
+
     const shareWord = getShareWord();
     const hasShareParam = !!new URLSearchParams(location.search).get('w');
-    if (shareWord) {
-        answer = shareWord;
-        $submitBtn.onclick  = submit;
-        $submitBtn.disabled = false;
-        const ra = document.getElementById('recent-answer');
-        const wu = document.getElementById('words-updated');
-        if (ra) ra.textContent = '';
-        if (wu) wu.textContent = '공유 게임';
-    } else if (hasShareParam) {
+
+    function showInvalidLink() {
         setMsg('잘못된 공유 링크입니다', 'error');
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
@@ -482,6 +484,24 @@ function init() {
             makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
             makeBtn.onmouseleave = () => makeBtn.style.filter = '';
         }
+    }
+
+    if (shareWord) {
+        const ra = document.getElementById('recent-answer');
+        const wu = document.getElementById('words-updated');
+        if (ra) ra.textContent = '';
+        if (wu) wu.textContent = '공유 게임';
+        // 사전 로드 후 공유 단어 검증
+        fetch('dict.json', { cache: 'force-cache' })
+            .then(r => r.json())
+            .then(data => {
+                if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
+                answer = shareWord;
+                $submitBtn.onclick  = submit;
+                $submitBtn.disabled = false;
+            });
+    } else if (hasShareParam) {
+        showInvalidLink();
     } else {
         fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
             .then(r => r.json())
