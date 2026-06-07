@@ -129,6 +129,27 @@ main {
 }
 #restart-btn:hover { filter: brightness(1.2); }
 
+#make-btn {
+    display: none;
+    width: 100%;
+    max-width: 480px;
+    padding: 14px;
+    margin-top: 8px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    background: #3a3a3c;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    touch-action: manipulation;
+    text-align: center;
+    text-decoration: none;
+    transition: filter 0.15s;
+    box-sizing: border-box;
+}
+#make-btn:hover { filter: brightness(1.2); }
+
 /* ── Message ── */
 #message {
     min-height: 20px;

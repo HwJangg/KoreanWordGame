@@ -300,10 +300,10 @@ function setMsg(text, type = '') {
 function endGame(msg, type) {
     gameOver = true;
     setMsg(msg, type);
-    $submitBtn.disabled = true;
+    $submitBtn.style.display = 'none';
     $restartBtn.style.display = '';
     const makeBtn = document.getElementById('make-btn');
-    if (makeBtn) makeBtn.style.display = '';
+    if (makeBtn) makeBtn.style.display = 'block';
 }
 
 function getShareWord() {
@@ -431,7 +431,10 @@ function init() {
 
     $restartBtn.style.display = 'none';
     $restartBtn.onclick = init;
+    $submitBtn.style.display = '';
     $submitBtn.disabled = true;
+    const makeBtn = document.getElementById('make-btn');
+    if (makeBtn) makeBtn.style.display = 'none';
 
     buildBoard();
     buildKeyboard();
