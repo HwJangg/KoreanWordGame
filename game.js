@@ -408,11 +408,7 @@ function submit() {
     }, 4 * 130 + 400);
 }
 
-async function init() {
-    const res  = await fetch('word.json?v=' + Date.now(), { cache: 'no-store' });
-    const data = await res.json();
-
-    answer   = data.word;
+function init() {
     attempt  = 0;
     gameOver = false;
     jamoState = {};
@@ -423,16 +419,24 @@ async function init() {
 
     $restartBtn.style.display = 'none';
     $restartBtn.onclick = init;
-    $submitBtn.onclick  = submit;
+    $submitBtn.disabled = true;
 
     buildBoard();
     buildKeyboard();
     cacheCells();
     imeReset();
     setMsg('');
-    document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
-    document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
     updateCurrentRow();
+
+    fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
+        .then(r => r.json())
+        .then(data => {
+            answer = data.word;
+            $submitBtn.onclick   = submit;
+            $submitBtn.disabled  = false;
+            document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
+            document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
+        });
 }
 
 if (document.readyState === 'loading') {
