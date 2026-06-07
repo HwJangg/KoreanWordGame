@@ -475,9 +475,12 @@ function init() {
         if (makeBtn) {
             makeBtn.textContent = '공유링크 만들기 ▶';
             makeBtn.style.display = 'block';
-            makeBtn.style.background = '#538d4e';
+            makeBtn.style.background = '#3a3a3c';
             makeBtn.style.color = '#fff';
             makeBtn.style.border = 'none';
+            makeBtn.style.transition = 'filter 0.15s';
+            makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
+            makeBtn.onmouseleave = () => makeBtn.style.filter = '';
         }
     } else {
         fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
