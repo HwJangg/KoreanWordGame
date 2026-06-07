@@ -312,7 +312,10 @@ function getShareWord() {
     try {
         const b64 = w.replace(/-/g, '+').replace(/_/g, '/');
         const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0) ^ 42);
-        return new TextDecoder().decode(bytes);
+        const word = new TextDecoder().decode(bytes);
+        if (![...word].every(ch => { const c = ch.codePointAt(0); return c >= 0xAC00 && c <= 0xD7A3; }))
+            return null;
+        return word;
     } catch { return null; }
 }
 
