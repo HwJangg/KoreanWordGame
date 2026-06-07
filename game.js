@@ -307,7 +307,7 @@ function endGame(msg, type) {
         makeBtn.style.display = 'block';
         makeBtn.style.border = 'none';
         makeBtn.style.color = '#fff';
-        makeBtn.style.background = type === 'success' ? '#538d4e' : '#c0392b';
+        makeBtn.style.background = '#555';
     }
 }
 
