@@ -131,7 +131,7 @@
     <div class="card hidden" id="link-box">
         <label>공유 링크</label>
         <div class="link-display" id="link-text"></div>
-        <button class="copy" onclick="copyLink()">링크 복사 📋</button>
+        <button class="copy" onclick="copyLink()">링크 복사</button>
     </div>
 </div>
 
@@ -227,9 +227,9 @@ window.generateLink = function() {
 window.copyLink = function() {
     const url = document.getElementById('link-text').textContent;
     navigator.clipboard.writeText(url).then(() => {
-        const btn = document.querySelector('.copy');
-        btn.textContent = '복사 완료 ✓';
-        setTimeout(() => btn.textContent = '링크 복사 📋', 2000);
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
     });
 };
 }());
