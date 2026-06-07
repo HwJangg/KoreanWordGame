@@ -75,6 +75,22 @@
         }
         button.primary:hover:not(:disabled) { filter: brightness(1.15); }
         button.primary:disabled { background: var(--border); cursor: default; }
+        #toast {
+            position: fixed;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #538d4e;
+            color: #fff;
+            padding: 10px 22px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        #toast.show { opacity: 1; }
         button.copy {
             width: 100%;
             padding: 12px;
@@ -119,6 +135,7 @@
     </div>
 </div>
 
+<div id="toast">링크가 복사되었습니다</div>
 <script src="korean_utils.js"></script>
 <script>
 (function() {
@@ -200,6 +217,11 @@ window.generateLink = function() {
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
+    navigator.clipboard.writeText(url).then(() => {
+        const toast = document.getElementById('toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2000);
+    });
 };
 
 window.copyLink = function() {
