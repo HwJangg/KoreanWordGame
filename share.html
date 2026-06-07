@@ -174,12 +174,12 @@ window.onWordInput = function() {
         btn.disabled = true;
         return;
     }
-    // if (_dictSet && !_dictSet.has(word)) {
-    //     hint.textContent = '사전에 없는 단어입니다';
-    //     hint.className = 'jamo-hint err';
-    //     btn.disabled = true;
-    //     return;
-    // }
+    if (_dictSet && !_dictSet.has(word)) {
+        hint.textContent = '사전에 없는 단어입니다';
+        hint.className = 'jamo-hint err';
+        btn.disabled = true;
+        return;
+    }
     hint.textContent = `자모 ${n}개`;
     hint.className = 'jamo-hint ok';
     btn.disabled = false;
@@ -189,7 +189,7 @@ window.generateLink = function() {
     const word = document.getElementById('word-input').value.trim();
     const isKoreanOnly = [...word].every(ch => { const c = ch.codePointAt(0); return c >= 0xAC00 && c <= 0xD7A3; });
     if (!isKoreanOnly || countJamo(word) !== 5) return;
-    // if (_dictSet && !_dictSet.has(word)) return;
+    if (_dictSet && !_dictSet.has(word)) return;
     const encoded = encodeWord(word);
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;

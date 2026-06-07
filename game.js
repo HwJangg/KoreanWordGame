@@ -96,8 +96,8 @@ function validateGuess(guess) {
     if (dubeolKeys.length !== 5)
         return `자모 ${dubeolKeys.length}개 (5개 필요)`;
 
-    // if (wordSet && !wordSet.has(guess))
-    //     return '사전에 없는 단어입니다';
+    if (wordSet && !wordSet.has(guess))
+        return '사전에 없는 단어입니다';
 
     if (VOWEL_CHARS.has(dubeolKeys[0]))
         return '모음으로 시작할 수 없습니다';
@@ -491,18 +491,14 @@ function init() {
         const wu = document.getElementById('words-updated');
         if (ra) ra.textContent = '';
         if (wu) wu.textContent = '공유 게임';
-        // 사전 검증 일시 비활성화 (dict.json 재생성 중)
-        answer = shareWord;
-        $submitBtn.onclick  = submit;
-        $submitBtn.disabled = false;
-        // fetch('dict.json', { cache: 'force-cache' })
-        //     .then(r => r.json())
-        //     .then(data => {
-        //         if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
-        //         answer = shareWord;
-        //         $submitBtn.onclick  = submit;
-        //         $submitBtn.disabled = false;
-        //     });
+        fetch('dict.json', { cache: 'force-cache' })
+            .then(r => r.json())
+            .then(data => {
+                if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
+                answer = shareWord;
+                $submitBtn.onclick  = submit;
+                $submitBtn.disabled = false;
+            });
     } else if (hasShareParam) {
         showInvalidLink();
     } else {
