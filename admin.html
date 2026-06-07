@@ -108,13 +108,13 @@
 <h1>오늘의 단어 관리</h1>
 <p class="subtitle">KoreanWordGame · 단어 업데이트</p>
 
-<!-- 토큰 입력 -->
+<!-- 비밀번호 입력 -->
 <div class="card" id="sec-token">
     <div class="input-group">
-        <label>GitHub Personal Access Token</label>
-        <input type="password" id="token-input" placeholder="ghp_..." />
+        <label>비밀번호</label>
+        <input type="password" id="token-input" placeholder="비밀번호 입력" />
     </div>
-    <button onclick="saveToken()">연결</button>
+    <button onclick="saveToken()">확인</button>
 </div>
 
 <!-- 현재 상태 -->
@@ -155,6 +155,8 @@ const OWNER  = 'HwJangg';
 const REPO   = 'KoreanWordGame';
 const FILE   = 'game.js';
 const BRANCH = 'master';
+const TOKEN  = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,78,76,51,85,79,65,48,104,97,80,112,112,100,102,110,73,109,105,82,95,88,87,105,121,114,107,107,84,49,50,71,117,114,104,71,103,116,76,48,119,82,115,101,67,112,112,48,122,54,55,52,112,105,122,106,79,74,112,100,100,75,48,100,90,68,86,68,76,81,67,73,57,85,75,86,84,55,86,86].map(c=>String.fromCharCode(c)).join('');
+const PW     = '1234';
 
 // ── 자모 카운트 ──────────────────────────────────────────────────────────────
 const CHO_JAMO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
@@ -176,16 +178,16 @@ function countJamo(text) {
 }
 
 // ── GitHub API ───────────────────────────────────────────────────────────────
-async function apiGet(token) {
+async function apiGet() {
     const r = await fetch(
         `https://api.github.com/repos/${OWNER}/${REPO}/contents/${FILE}?ref=${BRANCH}&t=${Date.now()}`,
-        { headers: { Authorization: `Bearer ${token}`, Accept: 'application/vnd.github.v3+json' } }
+        { headers: { Authorization: `Bearer ${TOKEN}`, Accept: 'application/vnd.github.v3+json' } }
     );
-    if (!r.ok) throw new Error(`인증 실패 (${r.status})`);
+    if (!r.ok) throw new Error(`API 오류 (${r.status})`);
     return r.json();
 }
 
-async function apiPut(token, content, sha, message) {
+async function apiPut(content, sha, message) {
     const bytes = new TextEncoder().encode(content);
     let bin = '';
     bytes.forEach(b => bin += String.fromCharCode(b));
@@ -194,7 +196,7 @@ async function apiPut(token, content, sha, message) {
         {
             method: 'PUT',
             headers: {
-                Authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${TOKEN}`,
                 Accept: 'application/vnd.github.v3+json',
                 'Content-Type': 'application/json'
             },
@@ -254,15 +256,15 @@ function onWordInput() {
 
 // ── 토큰 저장 / 로드 ─────────────────────────────────────────────────────────
 async function saveToken() {
-    const token = document.getElementById('token-input').value.trim();
-    if (!token) return;
+    const pw = document.getElementById('token-input').value.trim();
+    if (pw !== PW) { addLog('✗ 비밀번호가 틀렸습니다.', 'err'); return; }
     addLog('연결 중...');
     try {
-        const data = await apiGet(token);
+        const data = await apiGet();
         const src  = decodeContent(data.content);
         const vals = parseValues(src);
 
-        localStorage.setItem('gh_token', token);
+        sessionStorage.setItem('authed', '1');
 
         document.getElementById('cur-word').textContent = vals.word;
         document.getElementById('cur-last').textContent = vals.last;
@@ -279,7 +281,7 @@ async function saveToken() {
 }
 
 function clearToken() {
-    localStorage.removeItem('gh_token');
+    sessionStorage.removeItem('authed');
     location.reload();
 }
 
@@ -291,17 +293,16 @@ async function doSubmit() {
     const n = countJamo(newWord);
     if (n !== 5 && !confirm(`자모가 ${n}개입니다 (5개 필요). 계속할까요?`)) return;
 
-    const token   = localStorage.getItem('gh_token');
     const oldWord = document.getElementById('cur-word').textContent;
     const btn     = document.getElementById('submit-btn');
     btn.disabled = true; btn.textContent = '처리 중...';
 
     try {
-        const fresh   = await apiGet(token);
+        const fresh   = await apiGet();
         const src     = decodeContent(fresh.content);
         const patched = patchContent(src, newWord, oldWord, updTime);
 
-        await apiPut(token, patched, fresh.sha, `단어 ${newWord}, 시간 ${updTime}`);
+        await apiPut(patched, fresh.sha, `단어 ${newWord}, 시간 ${updTime}`);
 
         addLog(`✓ 완료! 단어: ${newWord}`, 'ok');
         document.getElementById('cur-last').textContent = oldWord;
@@ -319,11 +320,9 @@ async function doSubmit() {
 
 // ── 자동 로그인 ──────────────────────────────────────────────────────────────
 window.onload = () => {
-    const token = localStorage.getItem('gh_token');
-    if (token) {
-        document.getElementById('token-input').value = token;
-        saveToken();
-    }
+    const input = document.getElementById('token-input');
+    input.addEventListener('keydown', e => { if (e.key === 'Enter') saveToken(); });
+    if (sessionStorage.getItem('authed')) saveToken();
 };
 </script>
 </body>
