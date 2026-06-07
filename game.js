@@ -1,9 +1,9 @@
 // ── 상수 ──────────────────────────────────────────────────────────────────────
 
-const WORDS_UPDATED = '2026-06-07 09:43';
-const LAST_ANSWER   = '드립';
+const WORDS_UPDATED = '2026-06-07 10:02';
+const LAST_ANSWER   = '스푼';
 const WORDS = [
-    '스푼',
+    '드립',
 ];
 
 const MAX = 5;
