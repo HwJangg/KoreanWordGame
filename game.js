@@ -409,7 +409,7 @@ function submit() {
         if (won) {
             endGame(`정답! ${attempt}번 만에 맞췄습니다!`, 'success');
         } else if (attempt >= MAX) {
-            endGame(`실패! 정답은 '${answer}'였습니다.`, 'error');
+            endGame(`정답은 '${answer}'입니다!`, 'error');
         }
     }, 4 * 130 + 400);
 }
