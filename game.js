@@ -491,15 +491,18 @@ function init() {
         const wu = document.getElementById('words-updated');
         if (ra) ra.textContent = '';
         if (wu) wu.textContent = '공유 게임';
-        // 사전 로드 후 공유 단어 검증
-        fetch('dict.json', { cache: 'force-cache' })
-            .then(r => r.json())
-            .then(data => {
-                if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
-                answer = shareWord;
-                $submitBtn.onclick  = submit;
-                $submitBtn.disabled = false;
-            });
+        // 사전 검증 일시 비활성화 (dict.json 재생성 중)
+        answer = shareWord;
+        $submitBtn.onclick  = submit;
+        $submitBtn.disabled = false;
+        // fetch('dict.json', { cache: 'force-cache' })
+        //     .then(r => r.json())
+        //     .then(data => {
+        //         if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
+        //         answer = shareWord;
+        //         $submitBtn.onclick  = submit;
+        //         $submitBtn.disabled = false;
+        //     });
     } else if (hasShareParam) {
         showInvalidLink();
     } else {
