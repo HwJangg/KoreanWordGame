@@ -457,7 +457,7 @@ function init() {
         if (ra) ra.textContent = '';
         if (wu) wu.textContent = '공유 게임';
     } else if (hasShareParam) {
-        setMsg('잘못된 공유 링크입니다', 'error');
+        setMsg('잘못된 공유 링크입니다', 'gray');
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
         document.getElementById('board').style.display = 'none';
