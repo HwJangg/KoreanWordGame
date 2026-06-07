@@ -59,6 +59,55 @@ let answer, attempt, gameOver;
 let jamoState = {};
 let ime = { done: '', cho: -1, jung: -1, jong: 0 };
 let wordSet = null;
+let gameHistory = [];
+let _saveKey = null;
+
+function _today() {
+    return new Date().toISOString().slice(0, 10);
+}
+
+function _saveGame(endMsg, endType) {
+    if (!_saveKey) return;
+    localStorage.setItem(_saveKey, JSON.stringify({
+        date: _today(), history: gameHistory,
+        attempt, gameOver, jamoState,
+        endMsg: endMsg || '', endType: endType || ''
+    }));
+}
+
+function _loadGame() {
+    if (!_saveKey) return false;
+    try {
+        const s = JSON.parse(localStorage.getItem(_saveKey));
+        if (!s || !Array.isArray(s.history) || s.history.length === 0) return false;
+        if (s.date !== _today()) { localStorage.removeItem(_saveKey); return false; }
+        s.history.forEach((result, i) => { reveal(i, result); updateKeyboard(result); });
+        gameHistory = s.history;
+        attempt = s.attempt;
+        gameOver = s.gameOver;
+        jamoState = s.jamoState;
+        cacheCells();
+        if (s.gameOver) {
+            setMsg(s.endMsg, s.endType);
+            $submitBtn.style.display = 'none';
+            $restartBtn.style.display = '';
+            const makeBtn = document.getElementById('make-btn');
+            if (makeBtn) {
+                makeBtn.style.display = 'block';
+                makeBtn.style.border = 'none';
+                makeBtn.style.color = '#fff';
+                makeBtn.style.background = '#3a3a3c';
+                makeBtn.style.transition = 'filter 0.15s';
+                makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
+                makeBtn.onmouseleave = () => makeBtn.style.filter = '';
+            }
+        } else {
+            $submitBtn.onclick = submit;
+            $submitBtn.disabled = false;
+        }
+        return true;
+    } catch { return false; }
+}
 
 // DOM 캐시
 let $submitBtn, $restartBtn, $keyboard, $cells = [];
@@ -304,6 +353,7 @@ function setMsg(text, type = '') {
 function endGame(msg, type) {
     gameOver = true;
     setMsg(msg, type);
+    _saveGame(msg, type);
     $submitBtn.style.display = 'none';
     $restartBtn.style.display = '';
     const makeBtn = document.getElementById('make-btn');
@@ -422,10 +472,12 @@ function submit() {
     const result = judge(answer, guess);
     reveal(attempt, result);
     updateKeyboard(result);
+    gameHistory.push(result);
     attempt++;
-    cacheCells(); // 다음 행으로 캐시 갱신
+    cacheCells();
 
     const won = result.every(r => r.color === 'green');
+    if (!won && attempt < MAX) _saveGame();
     setTimeout(() => {
         if (won) {
             endGame(`정답! ${attempt}번 만에 맞췄습니다!`, 'success');
@@ -439,13 +491,14 @@ function init() {
     attempt  = 0;
     gameOver = false;
     jamoState = {};
+    gameHistory = [];
 
     $submitBtn  = document.getElementById('submit-btn');
     $restartBtn = document.getElementById('restart-btn');
     $keyboard   = document.getElementById('keyboard');
 
     $restartBtn.style.display = 'none';
-    $restartBtn.onclick = init;
+    $restartBtn.onclick = () => { if (_saveKey) { localStorage.removeItem(_saveKey); _saveKey = null; } init(); };
     $submitBtn.style.display = '';
     $submitBtn.disabled = true;
     const makeBtn = document.getElementById('make-btn');
@@ -499,8 +552,11 @@ function init() {
             .then(data => {
                 if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
                 answer = shareWord;
-                $submitBtn.onclick  = submit;
-                $submitBtn.disabled = false;
+                _saveKey = 'play_' + new URLSearchParams(location.search).get('w');
+                if (!_loadGame()) {
+                    $submitBtn.onclick  = submit;
+                    $submitBtn.disabled = false;
+                }
             });
     } else if (hasShareParam) {
         showInvalidLink();
