@@ -103,7 +103,8 @@ function _loadGame() {
             }
         } else {
             $submitBtn.onclick = submit;
-            $submitBtn.disabled = false;
+            $submitBtn.disabled = true;
+            updateCurrentRow();
         }
         return true;
     } catch { return false; }
