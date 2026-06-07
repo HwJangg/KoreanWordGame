@@ -307,7 +307,10 @@ function endGame(msg, type) {
         makeBtn.style.display = 'block';
         makeBtn.style.border = 'none';
         makeBtn.style.color = '#fff';
-        makeBtn.style.background = '#555';
+        makeBtn.style.background = '#3a3a3c';
+        makeBtn.style.transition = 'filter 0.15s';
+        makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
+        makeBtn.onmouseleave = () => makeBtn.style.filter = '';
     }
 }
 
