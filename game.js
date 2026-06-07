@@ -490,29 +490,42 @@ function submit() {
 }
 
 function _injectRules() {
-    const header = document.querySelector('header');
-    if (header) {
-        const btn = document.createElement('button');
-        btn.className = 'rules-btn';
-        btn.textContent = '?';
-        btn.onclick = () => { document.getElementById('rules-modal').style.display = 'flex'; };
-        header.appendChild(btn);
-    }
+    // 모달 먼저 생성
     const modal = document.createElement('div');
     modal.id = 'rules-modal';
-    modal.className = 'modal-overlay';
-    modal.style.display = 'none';
-    modal.innerHTML = `
-        <div class="modal-box">
-            <button class="modal-close" onclick="document.getElementById('rules-modal').style.display='none'">✕</button>
-            <h2>게임 규칙</h2>
-            <p class="modal-desc">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 자모의 색으로 힌트를 확인하세요.</p>
-            <div class="rule-item"><span class="rule-tile green">ㅏ</span> 정확한 자리의 자모</div>
-            <div class="rule-item"><span class="rule-tile yellow">ㄱ</span> 단어에 있지만 자리가 다른 자모</div>
-            <div class="rule-item"><span class="rule-tile gray">ㅎ</span> 단어에 없는 자모</div>
-        </div>`;
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:100;align-items:center;justify-content:center;';
     modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
+
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#1e1e20;border:1px solid #3a3a3c;border-radius:12px;padding:28px 24px 20px;max-width:300px;width:88%;box-sizing:border-box;';
+
+    const tile = (ch, bg) => `<span style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;font-size:1.05rem;font-weight:700;color:#fff;background:${bg};flex-shrink:0;">${ch}</span>`;
+    const row  = (ch, bg, text) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:0.88rem;">${tile(ch, bg)} ${text}</div>`;
+
+    box.innerHTML = `
+        <h2 style="font-size:1rem;margin-bottom:14px;text-align:center;letter-spacing:1px;">게임 규칙</h2>
+        <p style="font-size:0.82rem;color:#818384;margin-bottom:18px;line-height:1.6;text-align:center;">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 자모의 색으로 힌트를 확인하세요.</p>
+        ${row('ㅏ', '#538d4e', '정확한 자리의 자모')}
+        ${row('ㄱ', '#b59f3b', '단어에 있지만 자리가 다른 자모')}
+        ${row('ㅎ', '#3a3a3c', '단어에 없는 자모')}
+        <button id="rules-ok-btn" style="width:100%;padding:10px;margin-top:10px;background:#538d4e;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>`;
+
+    modal.appendChild(box);
     document.body.appendChild(modal);
+    document.getElementById('rules-ok-btn').onclick = () => { modal.style.display = 'none'; };
+
+    // 헤더 ? 버튼
+    const header = document.querySelector('header');
+    if (header) {
+        header.style.position = 'relative';
+        const btn = document.createElement('button');
+        btn.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:1px solid #565758;color:#818384;width:28px;height:28px;border-radius:50%;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;touch-action:manipulation;';
+        btn.textContent = '?';
+        btn.onmouseenter = () => { btn.style.color = '#fff'; btn.style.borderColor = '#fff'; };
+        btn.onmouseleave = () => { btn.style.color = '#818384'; btn.style.borderColor = '#565758'; };
+        btn.onclick = () => { modal.style.display = 'flex'; };
+        header.appendChild(btn);
+    }
 }
 
 function init() {
