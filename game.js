@@ -471,6 +471,8 @@ if (document.readyState === 'loading') {
     init();
 }
 document.addEventListener('keydown', e => {
+    const tag = document.activeElement.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA') return;
     if (gameOver) return;
     if (e.key === 'Enter') { submit(); return; }
     if (e.key === 'Backspace') { e.preventDefault(); imeBackspace(); return; }
