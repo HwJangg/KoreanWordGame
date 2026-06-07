@@ -160,7 +160,6 @@ main {
 }
 #message.error   { color: #ff6b6b; }
 #message.success { color: #6aaa64; }
-#message.gray    { color: #818384; }
 
 /* ── Keyboard ── */
 #keyboard {

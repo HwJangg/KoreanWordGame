@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>단어 도전장</title>
+    <meta property="og:title" content="단어 도전장" />
+    <meta property="og:description" content="친구가 보낸 단어 도전장! 5번 안에 맞춰보세요" />
+    <meta property="og:image" content="https://hwjangg.github.io/KoreanWordGame/og-image-share.png" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>오늘의 단어</h1>
+        <p id="recent-answer"></p>
+        <p id="words-updated"></p>
+    </header>
+    <main>
+        <div id="board"></div>
+        <p id="message"></p>
+        <div id="keyboard"></div>
+        <button id="submit-btn" disabled>입력</button>
+        <button id="restart-btn">다시 시작</button>
+        <a id="make-btn" href="share.html">나도 만들어보기 ▶</a>
+    </main>
+    <script src="korean_utils.js"></script>
+    <script>
+    (function() {
+        var s = document.createElement('script');
+        s.src = 'game.js?v=' + Date.now();
+        document.body.appendChild(s);
+    }());
+    </script>
+</body>
+</html>

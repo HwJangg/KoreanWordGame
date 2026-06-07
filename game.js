@@ -457,14 +457,20 @@ function init() {
         if (ra) ra.textContent = '';
         if (wu) wu.textContent = '공유 게임';
     } else if (hasShareParam) {
-        setMsg('잘못된 공유 링크입니다', 'gray');
+        setMsg('잘못된 공유 링크입니다', 'error');
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
         document.getElementById('board').style.display = 'none';
         $keyboard.style.display = 'none';
         $submitBtn.style.display = 'none';
         const makeBtn = document.getElementById('make-btn');
-        if (makeBtn) { makeBtn.textContent = '공유링크 만들기 ▶'; makeBtn.style.display = 'block'; }
+        if (makeBtn) {
+            makeBtn.textContent = '공유링크 만들기 ▶';
+            makeBtn.style.display = 'block';
+            makeBtn.style.background = '#538d4e';
+            makeBtn.style.color = '#fff';
+            makeBtn.style.border = 'none';
+        }
     } else {
         fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
             .then(r => r.json())

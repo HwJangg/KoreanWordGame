@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오늘의 단어</title>
-    <meta property="og:title" content="오늘의 단어 맞추기" />
-    <meta property="og:description" content="친구가 보낸 단어 도전!" />
+    <title>단어 도전장 만들기</title>
+    <meta property="og:title" content="단어 도전장 만들기" />
+    <meta property="og:description" content="친구에게 단어 도전장 보내기" />
     <meta property="og:image" content="https://hwjangg.github.io/KoreanWordGame/og-image.png" />
     <meta property="og:type" content="website" />
     <link rel="stylesheet" href="style.css">
@@ -96,13 +96,6 @@
             line-height: 1.5;
         }
         .hidden { display: none !important; }
-        #game {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            width: 100%;
-            min-height: 100vh;
-        }
     </style>
 </head>
 <body>
@@ -124,23 +117,6 @@
         <div class="link-display" id="link-text"></div>
         <button class="copy" onclick="copyLink()">링크 복사 📋</button>
     </div>
-</div>
-
-<!-- 게임 모드 -->
-<div id="game" class="hidden">
-    <header>
-        <h1>오늘의 단어</h1>
-        <p id="recent-answer"></p>
-        <p id="words-updated"></p>
-    </header>
-    <main>
-        <div id="board"></div>
-        <p id="message"></p>
-        <div id="keyboard"></div>
-        <button id="submit-btn" disabled>입력</button>
-        <button id="restart-btn">다시 시작</button>
-        <a id="make-btn" href="share.html">나도 만들어보기 ▶</a>
-    </main>
 </div>
 
 <script src="korean_utils.js"></script>
@@ -198,7 +174,7 @@ window.generateLink = function() {
     const isKoreanOnly = [...word].every(ch => { const c = ch.codePointAt(0); return c >= 0xAC00 && c <= 0xD7A3; });
     if (!isKoreanOnly || countJamo(word) !== 5) return;
     const encoded = encodeWord(word);
-    const url = location.origin + location.pathname + '?w=' + encoded;
+    const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
 };
@@ -211,20 +187,6 @@ window.copyLink = function() {
         setTimeout(() => btn.textContent = '링크 복사 📋', 2000);
     });
 };
-}());
-
-// 모드 결정
-const urlW = new URLSearchParams(location.search).get('w');
-if (urlW) {
-    document.getElementById('creator').classList.add('hidden');
-    document.getElementById('game').classList.remove('hidden');
-}
-</script>
-<script>
-(function() {
-    var s = document.createElement('script');
-    s.src = 'game.js?v=' + Date.now();
-    document.body.appendChild(s);
 }());
 </script>
 </body>
