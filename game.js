@@ -467,7 +467,8 @@ function init() {
     const hasShareParam = !!new URLSearchParams(location.search).get('w');
 
     function showInvalidLink() {
-        setMsg('잘못된 도전장 링크입니다.', 'error');
+        setMsg('잘못된 도전장 주소입니다.', 'error');
+        document.getElementById('message').style.marginTop = '36px';
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
         document.getElementById('board').style.display = 'none';
