@@ -150,33 +150,34 @@
 
 <script src="korean_utils.js"></script>
 <script>
-const KEY = 42;
-const CHO_JAMO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
-const JUNG_JAMO = ['ㅏ','ㅏㅣ','ㅑ','ㅑㅣ','ㅓ','ㅓㅣ','ㅕ','ㅕㅣ','ㅗ','ㅗㅏ','ㅗㅏㅣ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅓㅣ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
-const JONG_JAMO = ['','ㄱ','ㄱㄱ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+(function() {
+const _KEY = 42;
+const _CHO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const _JUNG = ['ㅏ','ㅏㅣ','ㅑ','ㅑㅣ','ㅓ','ㅓㅣ','ㅕ','ㅕㅣ','ㅗ','ㅗㅏ','ㅗㅏㅣ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅓㅣ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
+const _JONG = ['','ㄱ','ㄱㄱ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
 
-function countJamo(text) {
+window.countJamo = function(text) {
     let n = 0;
     for (const ch of text) {
         const code = ch.codePointAt(0);
         if (code >= 0xAC00 && code <= 0xD7A3) {
             const off = code - 0xAC00;
-            n += CHO_JAMO[Math.floor(off / (21 * 28))].length;
-            n += JUNG_JAMO[Math.floor((off % (21 * 28)) / 28)].length;
-            n += JONG_JAMO[off % 28].length;
+            n += _CHO[Math.floor(off / (21 * 28))].length;
+            n += _JUNG[Math.floor((off % (21 * 28)) / 28)].length;
+            n += _JONG[off % 28].length;
         } else { n += 1; }
     }
     return n;
-}
+};
 
-function encodeWord(word) {
+window.encodeWord = function(word) {
     const bytes = new TextEncoder().encode(word);
-    const xored = bytes.map(b => b ^ KEY);
+    const xored = bytes.map(b => b ^ _KEY);
     return btoa(String.fromCharCode(...xored))
         .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-}
+};
 
-function onWordInput() {
+window.onWordInput = function() {
     const word = document.getElementById('word-input').value.trim();
     const hint = document.getElementById('jamo-hint');
     const btn  = document.getElementById('gen-btn');
@@ -185,24 +186,25 @@ function onWordInput() {
     hint.textContent = `자모 ${n}개`;
     hint.className = 'jamo-hint ' + (n === 5 ? 'ok' : 'err');
     btn.disabled = (n !== 5);
-}
+};
 
-function generateLink() {
+window.generateLink = function() {
     const word = document.getElementById('word-input').value.trim();
     const encoded = encodeWord(word);
     const url = location.origin + location.pathname + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
-}
+};
 
-function copyLink() {
+window.copyLink = function() {
     const url = document.getElementById('link-text').textContent;
     navigator.clipboard.writeText(url).then(() => {
         const btn = document.querySelector('.copy');
         btn.textContent = '복사 완료 ✓';
         setTimeout(() => btn.textContent = '링크 복사 📋', 2000);
     });
-}
+};
+}());
 
 // 모드 결정
 const urlW = new URLSearchParams(location.search).get('w');
