@@ -460,6 +460,11 @@ function init() {
         setMsg('잘못된 공유 링크입니다', 'error');
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
+        document.getElementById('board').style.display = 'none';
+        $keyboard.style.display = 'none';
+        $submitBtn.style.display = 'none';
+        const makeBtn = document.getElementById('make-btn');
+        if (makeBtn) { makeBtn.textContent = '공유링크 만들기 ▶'; makeBtn.style.display = 'block'; }
     } else {
         fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
             .then(r => r.json())
