@@ -303,7 +303,12 @@ function endGame(msg, type) {
     $submitBtn.style.display = 'none';
     $restartBtn.style.display = '';
     const makeBtn = document.getElementById('make-btn');
-    if (makeBtn) makeBtn.style.display = 'block';
+    if (makeBtn) {
+        makeBtn.style.display = 'block';
+        makeBtn.style.border = 'none';
+        makeBtn.style.color = '#fff';
+        makeBtn.style.background = type === 'success' ? '#538d4e' : '#c0392b';
+    }
 }
 
 function getShareWord() {
