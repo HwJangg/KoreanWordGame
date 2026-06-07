@@ -302,6 +302,18 @@ function endGame(msg, type) {
     setMsg(msg, type);
     $submitBtn.disabled = true;
     $restartBtn.style.display = '';
+    const makeBtn = document.getElementById('make-btn');
+    if (makeBtn) makeBtn.style.display = '';
+}
+
+function getShareWord() {
+    const w = new URLSearchParams(location.search).get('w');
+    if (!w) return null;
+    try {
+        const b64 = w.replace(/-/g, '+').replace(/_/g, '/');
+        const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0) ^ 42);
+        return new TextDecoder().decode(bytes);
+    } catch { return null; }
 }
 
 function buildKeyboard() {
@@ -428,15 +440,26 @@ function init() {
     setMsg('');
     updateCurrentRow();
 
-    fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
-        .then(r => r.json())
-        .then(data => {
-            answer = data.word;
-            $submitBtn.onclick   = submit;
-            $submitBtn.disabled  = false;
-            document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
-            document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
-        });
+    const shareWord = getShareWord();
+    if (shareWord) {
+        answer = shareWord;
+        $submitBtn.onclick  = submit;
+        $submitBtn.disabled = false;
+        const ra = document.getElementById('recent-answer');
+        const wu = document.getElementById('words-updated');
+        if (ra) ra.textContent = '';
+        if (wu) wu.textContent = '공유 게임';
+    } else {
+        fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
+            .then(r => r.json())
+            .then(data => {
+                answer = data.word;
+                $submitBtn.onclick   = submit;
+                $submitBtn.disabled  = false;
+                document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
+                document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
+            });
+    }
 }
 
 if (document.readyState === 'loading') {

@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오늘의 단어</title>
+    <meta property="og:title" content="오늘의 단어 맞추기" />
+    <meta property="og:description" content="친구가 보낸 단어 도전!" />
+    <meta property="og:image" content="https://hwjangg.github.io/KoreanWordGame/og-image.png" />
+    <meta property="og:type" content="website" />
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg:     #121213;
+            --card:   #1e1e20;
+            --border: #3a3a3c;
+            --text:   #fff;
+            --gray:   #818384;
+            --green:  #538d4e;
+            --red:    #ff6b6b;
+        }
+        #creator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 36px 16px;
+            background: var(--bg);
+            color: var(--text);
+            font-family: 'Segoe UI', 'Noto Sans KR', sans-serif;
+        }
+        #creator h1 { font-size: 1.4rem; letter-spacing: 2px; margin-bottom: 6px; }
+        #creator .subtitle { color: var(--gray); font-size: 0.78rem; margin-bottom: 28px; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 22px;
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 12px;
+            box-sizing: border-box;
+        }
+        label { display: block; font-size: 0.78rem; color: var(--gray); margin-bottom: 6px; }
+        input[type=text] {
+            width: 100%;
+            background: #2a2a3a;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            font-size: 1rem;
+            padding: 10px 12px;
+            outline: none;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        input:focus { border-color: var(--green); }
+        .input-group { margin-bottom: 14px; }
+        .jamo-hint { font-size: 0.78rem; margin-top: 5px; }
+        .ok  { color: var(--green); }
+        .err { color: var(--red); }
+        button.primary {
+            width: 100%;
+            padding: 12px;
+            background: var(--green);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: filter 0.15s;
+            margin-top: 4px;
+        }
+        button.primary:hover:not(:disabled) { filter: brightness(1.15); }
+        button.primary:disabled { background: var(--border); cursor: default; }
+        button.copy {
+            width: 100%;
+            padding: 12px;
+            background: #3a3a3c;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 10px;
+        }
+        .link-display {
+            font-size: 0.78rem;
+            color: var(--gray);
+            word-break: break-all;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<!-- 만들기 모드 -->
+<div id="creator">
+    <h1>오늘의 단어</h1>
+    <p class="subtitle">친구에게 단어 도전장 보내기</p>
+    <div class="card">
+        <div class="input-group">
+            <label>단어 입력</label>
+            <input type="text" id="word-input" placeholder="한글 단어 입력" oninput="onWordInput()" />
+            <div class="jamo-hint" id="jamo-hint"></div>
+        </div>
+        <button class="primary" id="gen-btn" onclick="generateLink()" disabled>링크 생성</button>
+    </div>
+    <div class="card hidden" id="link-box">
+        <label>공유 링크</label>
+        <div class="link-display" id="link-text"></div>
+        <button class="copy" onclick="copyLink()">링크 복사 📋</button>
+    </div>
+</div>
+
+<!-- 게임 모드 -->
+<div id="game" class="hidden">
+    <header>
+        <h1>오늘의 단어</h1>
+        <p id="recent-answer"></p>
+        <p id="words-updated"></p>
+    </header>
+    <main>
+        <div id="board"></div>
+        <p id="message"></p>
+        <div id="keyboard"></div>
+        <button id="submit-btn" disabled>입력</button>
+        <button id="restart-btn">다시 시작</button>
+        <a id="make-btn" href="share.html"
+           style="display:none; text-align:center; margin-top:10px; padding:11px;
+                  border:1px solid #3a3a3c; border-radius:6px; color:#818384;
+                  font-size:0.9rem; text-decoration:none; transition:color .15s;">
+            나도 만들어보기 →
+        </a>
+    </main>
+</div>
+
+<script src="korean_utils.js"></script>
+<script>
+const KEY = 42;
+const CHO_JAMO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+const JUNG_JAMO = ['ㅏ','ㅏㅣ','ㅑ','ㅑㅣ','ㅓ','ㅓㅣ','ㅕ','ㅕㅣ','ㅗ','ㅗㅏ','ㅗㅏㅣ','ㅗㅣ','ㅛ','ㅜ','ㅜㅓ','ㅜㅓㅣ','ㅜㅣ','ㅠ','ㅡ','ㅡㅣ','ㅣ'];
+const JONG_JAMO = ['','ㄱ','ㄱㄱ','ㄱㅅ','ㄴ','ㄴㅈ','ㄴㅎ','ㄷ','ㄹ','ㄹㄱ','ㄹㅁ','ㄹㅂ','ㄹㅅ','ㄹㅌ','ㄹㅍ','ㄹㅎ','ㅁ','ㅂ','ㅂㅅ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+
+function countJamo(text) {
+    let n = 0;
+    for (const ch of text) {
+        const code = ch.codePointAt(0);
+        if (code >= 0xAC00 && code <= 0xD7A3) {
+            const off = code - 0xAC00;
+            n += CHO_JAMO[Math.floor(off / (21 * 28))].length;
+            n += JUNG_JAMO[Math.floor((off % (21 * 28)) / 28)].length;
+            n += JONG_JAMO[off % 28].length;
+        } else { n += 1; }
+    }
+    return n;
+}
+
+function encodeWord(word) {
+    const bytes = new TextEncoder().encode(word);
+    const xored = bytes.map(b => b ^ KEY);
+    return btoa(String.fromCharCode(...xored))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
+}
+
+function onWordInput() {
+    const word = document.getElementById('word-input').value.trim();
+    const hint = document.getElementById('jamo-hint');
+    const btn  = document.getElementById('gen-btn');
+    if (!word) { hint.textContent = ''; btn.disabled = true; return; }
+    const n = countJamo(word);
+    hint.textContent = `자모 ${n}개`;
+    hint.className = 'jamo-hint ' + (n === 5 ? 'ok' : 'err');
+    btn.disabled = (n !== 5);
+}
+
+function generateLink() {
+    const word = document.getElementById('word-input').value.trim();
+    const encoded = encodeWord(word);
+    const url = location.origin + location.pathname + '?w=' + encoded;
+    document.getElementById('link-text').textContent = url;
+    document.getElementById('link-box').classList.remove('hidden');
+}
+
+function copyLink() {
+    const url = document.getElementById('link-text').textContent;
+    navigator.clipboard.writeText(url).then(() => {
+        const btn = document.querySelector('.copy');
+        btn.textContent = '복사 완료 ✓';
+        setTimeout(() => btn.textContent = '링크 복사 📋', 2000);
+    });
+}
+
+// 모드 결정
+const urlW = new URLSearchParams(location.search).get('w');
+if (urlW) {
+    document.getElementById('creator').classList.add('hidden');
+    document.getElementById('game').classList.remove('hidden');
+}
+</script>
+<script src="game.js"></script>
+</body>
+</html>
