@@ -124,7 +124,7 @@
 (function() {
 const _KEY = 42;
 let _dictSet = null;
-fetch('dict.json', { cache: 'force-cache' })
+fetch('dict.json?v=2')
     .then(r => r.json())
     .then(data => { _dictSet = new Set(data); onWordInput(); });
 const _CHO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];

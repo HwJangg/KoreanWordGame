@@ -459,7 +459,7 @@ function init() {
     updateCurrentRow();
 
     // 사전 로드 (비동기, 추측 제출 전까지만 완료되면 됨)
-    fetch('dict.json', { cache: 'force-cache' })
+    fetch('dict.json?v=2')
         .then(r => r.json())
         .then(data => { wordSet = new Set(data); });
 
@@ -491,7 +491,7 @@ function init() {
         const wu = document.getElementById('words-updated');
         if (ra) ra.textContent = '';
         if (wu) wu.textContent = '공유 게임';
-        fetch('dict.json', { cache: 'force-cache' })
+        fetch('dict.json?v=2')
             .then(r => r.json())
             .then(data => {
                 if (!new Set(data).has(shareWord)) { showInvalidLink(); return; }
