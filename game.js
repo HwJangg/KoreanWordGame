@@ -469,6 +469,7 @@ function init() {
     function showInvalidLink() {
         setMsg('잘못된 도전장 주소입니다.', 'error');
         document.getElementById('message').style.marginTop = '12px';
+        document.getElementById('message').style.fontSize = '1.1rem';
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
         document.getElementById('board').style.display = 'none';
@@ -476,7 +477,7 @@ function init() {
         $submitBtn.style.display = 'none';
         const makeBtn = document.getElementById('make-btn');
         if (makeBtn) {
-            makeBtn.textContent = '공유링크 만들기 ▶';
+            makeBtn.textContent = '새 도전장 만들기 ▶';
             makeBtn.style.display = 'block';
             makeBtn.style.marginTop = '28px';
             makeBtn.style.background = '#3a3a3c';
