@@ -90,7 +90,7 @@ function _loadGame() {
         if (s.gameOver) {
             setMsg(s.endMsg, s.endType);
             $submitBtn.style.display = 'none';
-            $restartBtn.style.display = '';
+            if ($restartBtn) $restartBtn.style.display = '';
             const makeBtn = document.getElementById('make-btn');
             if (makeBtn) {
                 makeBtn.style.display = 'block';
