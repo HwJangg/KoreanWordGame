@@ -439,7 +439,11 @@ function init() {
     updateCurrentRow();
 }
 
-document.addEventListener('DOMContentLoaded', init);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
 document.addEventListener('keydown', e => {
     if (gameOver) return;
     if (e.key === 'Enter') { submit(); return; }
