@@ -355,7 +355,6 @@ function endGame(msg, type) {
     setMsg(msg, type);
     _saveGame(msg, type);
     $submitBtn.style.display = 'none';
-    $restartBtn.style.display = '';
     const makeBtn = document.getElementById('make-btn');
     if (makeBtn) {
         makeBtn.style.display = 'block';
@@ -497,8 +496,7 @@ function init() {
     $restartBtn = document.getElementById('restart-btn');
     $keyboard   = document.getElementById('keyboard');
 
-    $restartBtn.style.display = 'none';
-    $restartBtn.onclick = () => { if (_saveKey) { localStorage.removeItem(_saveKey); _saveKey = null; } init(); };
+    if ($restartBtn) $restartBtn.style.display = 'none';
     $submitBtn.style.display = '';
     $submitBtn.disabled = true;
     const makeBtn = document.getElementById('make-btn');
