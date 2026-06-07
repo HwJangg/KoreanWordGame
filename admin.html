@@ -86,6 +86,8 @@
         button:hover:not(:disabled) { filter: brightness(1.15); }
         button:disabled { background: var(--border); cursor: default; }
         .btn-sub { background: #3a3a3c; margin-top: 8px; font-size: 0.85rem; }
+        .btn-game { display: block; text-align: center; margin-top: 10px; padding: 10px; background: #2a2a3a; color: var(--gray); border: 1px solid var(--border); border-radius: 6px; font-size: 0.85rem; text-decoration: none; transition: color 0.15s; }
+        .btn-game:hover { color: var(--text); }
 
         #log {
             width: 100%;
@@ -115,6 +117,7 @@
         <input type="password" id="token-input" placeholder="비밀번호 입력" />
     </div>
     <button onclick="saveToken()">확인</button>
+    <a class="btn-game" href="https://hwjangg.github.io/KoreanWordGame/" target="_blank">문제 풀러가기 →</a>
 </div>
 
 <!-- 현재 상태 -->
@@ -146,6 +149,7 @@
     </div>
     <button id="submit-btn" onclick="doSubmit()">업데이트 &amp; 푸시</button>
     <button class="btn-sub" onclick="clearToken()">로그아웃</button>
+    <a class="btn-game" href="https://hwjangg.github.io/KoreanWordGame/" target="_blank">문제 풀러가기 →</a>
 </div>
 
 <div id="log"></div>
