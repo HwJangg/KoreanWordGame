@@ -135,20 +135,20 @@ main {
     max-width: 480px;
     padding: 14px;
     margin-top: 8px;
-    font-size: 1.3rem;
+    font-size: 1.1rem;
     font-weight: 700;
-    background: #b59f3b;
-    color: #fff;
-    border: none;
+    background: transparent;
+    color: #b59f3b;
+    border: 2px solid #b59f3b;
     border-radius: 6px;
     cursor: pointer;
     touch-action: manipulation;
     text-align: center;
     text-decoration: none;
-    transition: filter 0.15s;
+    transition: background 0.15s, color 0.15s;
     box-sizing: border-box;
 }
-#make-btn:hover { filter: brightness(1.2); }
+#make-btn:hover { background: #b59f3b; color: #fff; }
 
 /* ── Message ── */
 #message {
