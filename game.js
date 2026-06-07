@@ -467,7 +467,7 @@ function init() {
     const hasShareParam = !!new URLSearchParams(location.search).get('w');
 
     function showInvalidLink() {
-        setMsg('잘못된 공유 링크입니다', 'error');
+        setMsg('잘못된 도전장 링크입니다.', 'error');
         const wu = document.getElementById('words-updated');
         if (wu) wu.textContent = '';
         document.getElementById('board').style.display = 'none';
@@ -477,6 +477,7 @@ function init() {
         if (makeBtn) {
             makeBtn.textContent = '공유링크 만들기 ▶';
             makeBtn.style.display = 'block';
+            makeBtn.style.marginTop = '28px';
             makeBtn.style.background = '#3a3a3c';
             makeBtn.style.color = '#fff';
             makeBtn.style.border = 'none';
