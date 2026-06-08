@@ -105,18 +105,8 @@ function _loadGame() {
         if (s.gameOver) {
             setMsg(s.endMsg, s.endType);
             $submitBtn.style.display = 'none';
-            _showShareBtn();
+            _showEndButtons();
             if ($restartBtn) $restartBtn.style.display = '';
-            const makeBtn = document.getElementById('make-btn');
-            if (makeBtn) {
-                makeBtn.style.display = 'block';
-                makeBtn.style.border = 'none';
-                makeBtn.style.color = '#fff';
-                makeBtn.style.background = '#3a3a3c';
-                makeBtn.style.transition = 'filter 0.15s';
-                makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
-                makeBtn.onmouseleave = () => makeBtn.style.filter = '';
-            }
         } else {
             $submitBtn.onclick = submit;
             $submitBtn.disabled = true;
@@ -379,9 +369,9 @@ function setMsg(text, type = '') {
     el.className   = type;
 }
 
-function _showShareBtn() {
-    const btn = document.getElementById('share-result-btn');
-    if (btn) btn.style.display = '';
+function _showEndButtons() {
+    const row = document.getElementById('end-btn-row');
+    if (row) row.style.display = 'flex';
 }
 
 function _shareResult() {
@@ -416,17 +406,7 @@ function endGame(msg, type) {
     setMsg(msg, type);
     _saveGame(msg, type);
     $submitBtn.style.display = 'none';
-    _showShareBtn();
-    const makeBtn = document.getElementById('make-btn');
-    if (makeBtn) {
-        makeBtn.style.display = 'block';
-        makeBtn.style.border = 'none';
-        makeBtn.style.color = '#fff';
-        makeBtn.style.background = '#3a3a3c';
-        makeBtn.style.transition = 'filter 0.15s';
-        makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
-        makeBtn.onmouseleave = () => makeBtn.style.filter = '';
-    }
+    _showEndButtons();
 }
 
 function getShareWord() {
@@ -601,20 +581,37 @@ function init() {
     $submitBtn.style.display = '';
     $submitBtn.disabled = true;
     const makeBtn = document.getElementById('make-btn');
-    if (makeBtn) makeBtn.style.display = 'none';
-
     _injectRules();
 
-    // 결과 공유 버튼 (게임 종료 후 표시)
-    if (!document.getElementById('share-result-btn')) {
+    // 종료 버튼 행 (결과 공유 + 나도 만들어보기) — 처음 한 번만 생성
+    let endRow = document.getElementById('end-btn-row');
+    if (!endRow) {
+        endRow = document.createElement('div');
+        endRow.id = 'end-btn-row';
+        endRow.style.cssText = 'display:none;width:100%;max-width:480px;gap:8px;margin-top:8px;box-sizing:border-box;';
+
+        const btnCss = 'flex:1;padding:13px;font-size:1rem;font-weight:700;background:#3a3a3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;text-align:center;text-decoration:none;box-sizing:border-box;';
+
         const shareBtn = document.createElement('button');
         shareBtn.id = 'share-result-btn';
         shareBtn.textContent = '결과 공유';
-        shareBtn.style.cssText = 'display:none;width:100%;max-width:480px;padding:13px;margin-top:8px;font-size:1rem;font-weight:700;background:#538d4e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;';
-        shareBtn.onmouseenter = () => shareBtn.style.filter = 'brightness(1.15)';
+        shareBtn.style.cssText = btnCss;
+        shareBtn.onmouseenter = () => shareBtn.style.filter = 'brightness(1.4)';
         shareBtn.onmouseleave = () => shareBtn.style.filter = '';
         shareBtn.onclick = _shareResult;
-        $submitBtn.insertAdjacentElement('afterend', shareBtn);
+        endRow.appendChild(shareBtn);
+
+        const makeBtn = document.getElementById('make-btn');
+        if (makeBtn) {
+            makeBtn.style.cssText = btnCss;
+            makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
+            makeBtn.onmouseleave = () => makeBtn.style.filter = '';
+            endRow.appendChild(makeBtn);
+        }
+
+        $submitBtn.insertAdjacentElement('afterend', endRow);
+    } else {
+        endRow.style.display = 'none';
     }
 
     buildBoard();
