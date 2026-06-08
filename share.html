@@ -187,7 +187,7 @@ window.onWordInput = function() {
     }
     const n = countJamo(word);
     if (n !== 5) {
-        hint.textContent = `자모 ${n}개`;
+        hint.textContent = `자음 + 모음 = ${n}개`;
         hint.className = 'jamo-hint err';
         btn.disabled = true;
         return;
@@ -204,7 +204,7 @@ window.onWordInput = function() {
         btn.disabled = true;
         return;
     }
-    hint.textContent = `자모 ${n}개`;
+    hint.textContent = `자음 + 모음 = ${n}개`;
     hint.className = 'jamo-hint ok';
     btn.disabled = false;
 };
