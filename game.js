@@ -382,7 +382,7 @@ function _shareResult() {
         ? (won ? `단어 도전 성공 ${gameHistory.length}/${MAX}` : `단어 도전 실패!`)
         : (won ? `오늘의 단어 ${gameHistory.length}/${MAX}` : `오늘의 단어 X/${MAX}`);
     const grid = gameHistory.map(row =>
-        row.map(({color}) => color === 'green' ? '🟢' : color === 'yellow' ? '🟡' : '⚫').join('')
+        row.map(({color}) => color === 'green' ? '🟢' : color === 'yellow' ? '🟡' : '⚪').join('')
     ).join('\n');
     const url = isChallenge ? '\n' + location.href : '\nhttps://hwjangg.github.io/KoreanWordGame/';
     const text = `${title}\n${grid}${url}`;
