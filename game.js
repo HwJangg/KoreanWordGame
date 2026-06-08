@@ -378,7 +378,7 @@ function _shareResult() {
     const won = gameHistory.length > 0 && gameHistory[gameHistory.length - 1].every(r => r.color === 'green');
     const isChallenge = !!new URLSearchParams(location.search).get('w');
     const title = isChallenge
-        ? (won ? `단어 도전 성공 ${gameHistory.length}/${MAX}` : `단어 도전 실패 X/${MAX}`)
+        ? (won ? `단어 도전 성공 ${gameHistory.length}/${MAX}` : `단어 도전 실패!`)
         : (won ? `오늘의 단어 ${gameHistory.length}/${MAX}` : `오늘의 단어 X/${MAX}`);
     const grid = gameHistory.map(row =>
         row.map(({color}) => color === 'green' ? '🟩' : color === 'yellow' ? '🟨' : '⬛').join('')
