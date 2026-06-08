@@ -32,14 +32,23 @@ jobs:
           new_word = random.choice(candidates)
 
           kst = datetime.timezone(datetime.timedelta(hours=9))
-          updated = datetime.datetime.now(kst).strftime('%Y-%m-%d %H:%M')
+          now_kst = datetime.datetime.now(kst)
+          updated = now_kst.strftime('%Y-%m-%d %H:%M')
+          today_date = now_kst.strftime('%Y-%m-%d')
+          current_hour = now_kst.hour
+
+          today_words = {}
+          if current.get('today_date') == today_date:
+              today_words = current.get('today_words', {})
+          today_words[str(current_hour)] = new_word
 
           with open('word.json', 'w', encoding='utf-8') as f:
-              json.dump({'word': new_word, 'last': current_word, 'updated': updated},
+              json.dump({'word': new_word, 'last': current_word, 'updated': updated,
+                         'today_date': today_date, 'today_words': today_words},
                         f, ensure_ascii=False, indent=2)
               f.write('\n')
 
-          print(f'{current_word} → {new_word}  ({updated} KST)')
+          print(f'{current_word} → {new_word}  (hour {current_hour}, {updated} KST)')
           PYEOF
 
       - name: 커밋 및 푸시

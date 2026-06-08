@@ -65,6 +65,7 @@ let ime = { done: '', cho: -1, jung: -1, jong: 0 };
 let wordSet = null;
 let gameHistory = [];
 let _saveKey = null;
+let todayWords = {};
 
 function _today() {
     return new Date().toISOString().slice(0, 10);
@@ -381,7 +382,7 @@ function _shareResult() {
         ? (won ? `단어 도전 성공 ${gameHistory.length}/${MAX}` : `단어 도전 실패!`)
         : (won ? `오늘의 단어 ${gameHistory.length}/${MAX}` : `오늘의 단어 X/${MAX}`);
     const grid = gameHistory.map(row =>
-        row.map(({color}) => color === 'green' ? '🟩' : color === 'yellow' ? '🟨' : '⬛').join('')
+        row.map(({color}) => color === 'green' ? '🟢' : color === 'yellow' ? '🟡' : '⚫').join('')
     ).join('\n');
     const url = isChallenge ? '\n' + location.href : '\nhttps://hwjangg.github.io/KoreanWordGame/';
     const text = `${title}\n${grid}${url}`;
@@ -567,6 +568,81 @@ function _injectRules() {
     }
 }
 
+function _showAnswerModal() {
+    if (document.getElementById('answer-modal')) return;
+    const kstHour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
+    if (kstHour >= 23) { const b = document.getElementById('answer-reveal-btn'); if (b) b.remove(); return; }
+
+    const overlay = document.createElement('div');
+    overlay.id = 'answer-modal';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:100;display:flex;align-items:center;justify-content:center;';
+    overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
+
+    const box = document.createElement('div');
+    box.style.cssText = 'background:#1e1e20;border:1px solid #3a3a3c;border-radius:12px;padding:20px 18px 16px;max-width:320px;width:92%;box-sizing:border-box;';
+
+    const title = document.createElement('h2');
+    title.textContent = '정답 단어';
+    title.style.cssText = 'font-size:1rem;text-align:center;margin-bottom:14px;letter-spacing:1px;';
+    box.appendChild(title);
+
+    const cols = document.createElement('div');
+    cols.style.cssText = 'display:flex;gap:8px;margin-bottom:14px;';
+    const leftCol = document.createElement('div');
+    leftCol.style.cssText = 'flex:1;';
+    const rightCol = document.createElement('div');
+    rightCol.style.cssText = 'flex:1;';
+
+    for (let h = 0; h < 24; h++) {
+        const cell = document.createElement('div');
+        cell.style.cssText = 'display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;';
+
+        const hSpan = document.createElement('span');
+        hSpan.textContent = `${h}시`;
+        hSpan.style.cssText = 'font-size:0.75rem;color:#818384;min-width:26px;';
+
+        const wSpan = document.createElement('span');
+        wSpan.textContent = h < kstHour ? (todayWords[String(h)] || '—')
+            : (h === kstHour && gameOver) ? answer : '';
+        wSpan.style.cssText = 'font-size:0.88rem;color:#aaa;';
+
+        cell.appendChild(hSpan);
+        cell.appendChild(wSpan);
+        (h < 12 ? leftCol : rightCol).appendChild(cell);
+    }
+    cols.appendChild(leftCol);
+    cols.appendChild(rightCol);
+    box.appendChild(cols);
+
+    const okBtn = document.createElement('button');
+    okBtn.textContent = '확인';
+    okBtn.style.cssText = 'width:100%;padding:10px;background:#538d4e;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;';
+    okBtn.onclick = () => overlay.remove();
+    box.appendChild(okBtn);
+
+    overlay.appendChild(box);
+    document.body.appendChild(overlay);
+}
+
+function _injectAnswerBtn() {
+    if (new URLSearchParams(location.search).get('w') !== null) return;
+    if (document.getElementById('answer-reveal-btn')) return;
+    const kstHour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
+    if (kstHour >= 23) return;
+
+    const header = document.querySelector('header');
+    if (!header) return;
+
+    const btn = document.createElement('button');
+    btn.id = 'answer-reveal-btn';
+    btn.textContent = '⏱';
+    btn.style.cssText = 'position:absolute;right:48px;top:50%;transform:translateY(-50%);background:none;border:1px solid #565758;color:#818384;width:28px;height:28px;border-radius:50%;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;touch-action:manipulation;';
+    btn.onmouseenter = () => { btn.style.color = '#fff'; btn.style.borderColor = '#fff'; };
+    btn.onmouseleave = () => { btn.style.color = '#818384'; btn.style.borderColor = '#565758'; };
+    btn.onclick = _showAnswerModal;
+    header.appendChild(btn);
+}
+
 function init() {
     attempt  = 0;
     gameOver = false;
@@ -582,6 +658,7 @@ function init() {
     $submitBtn.disabled = true;
     const makeBtn = document.getElementById('make-btn');
     _injectRules();
+    _injectAnswerBtn();
 
     // 종료 버튼 행 (결과 공유 + 나도 만들어보기) — 처음 한 번만 생성
     let endRow = document.getElementById('end-btn-row');
@@ -675,6 +752,7 @@ function init() {
             .then(r => r.json())
             .then(data => {
                 answer = data.word;
+                todayWords = data.today_words || {};
                 document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
                 document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
                 _saveKey = 'daily';
