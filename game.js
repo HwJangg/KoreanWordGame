@@ -73,8 +73,8 @@ function _today() {
 function _saveGame(endMsg, endType) {
     if (!_saveKey) return;
     localStorage.setItem(_saveKey, JSON.stringify({
-        date: _today(), history: gameHistory,
-        attempt, gameOver, jamoState,
+        date: _today(), answer,
+        history: gameHistory, attempt, gameOver, jamoState,
         endMsg: endMsg || '', endType: endType || ''
     }));
 }
@@ -84,7 +84,13 @@ function _loadGame() {
     try {
         const s = JSON.parse(localStorage.getItem(_saveKey));
         if (!s || !Array.isArray(s.history) || s.history.length === 0) return false;
-        if (s.date !== _today()) { localStorage.removeItem(_saveKey); return false; }
+        // 오늘의 단어: 저장된 정답 ≠ 현재 정답이면 초기화
+        // 공유 게임: 날짜가 다르면 초기화
+        if (_saveKey === 'daily') {
+            if (s.answer !== answer) { localStorage.removeItem(_saveKey); return false; }
+        } else {
+            if (s.date !== _today()) { localStorage.removeItem(_saveKey); return false; }
+        }
         s.history.forEach((result, i) => { reveal(i, result, true); updateKeyboard(result); });
         gameHistory = s.history;
         attempt = s.attempt;
@@ -622,10 +628,7 @@ function init() {
                 answer = data.word;
                 document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
                 document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
-                _saveKey = 'daily_' + answer;
-                for (const k of [...Object.keys(localStorage)]) {
-                    if (k.startsWith('daily_') && k !== _saveKey) localStorage.removeItem(k);
-                }
+                _saveKey = 'daily';
                 if (!_loadGame()) {
                     $submitBtn.onclick  = submit;
                     $submitBtn.disabled = false;
