@@ -1,0 +1,49 @@
+name: 시간별 단어 자동 갱신
+
+on:
+  schedule:
+    - cron: '0 * * * *'   # 매시 정각 (UTC) = 한국 시간 매시 9시~10시
+  workflow_dispatch:        # 수동 실행 (GitHub Actions 탭에서 즉시 트리거)
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 랜덤 단어 선택 및 word.json 갱신
+        run: |
+          python3 - <<'PYEOF'
+          import json, random, datetime
+
+          with open('dict.json', encoding='utf-8') as f:
+              words = json.load(f)
+
+          with open('word.json', encoding='utf-8') as f:
+              current = json.load(f)
+
+          current_word = current.get('word', '')
+          candidates = [w for w in words if w != current_word]
+          new_word = random.choice(candidates)
+
+          kst = datetime.timezone(datetime.timedelta(hours=9))
+          updated = datetime.datetime.now(kst).strftime('%Y-%m-%d %H:%M')
+
+          with open('word.json', 'w', encoding='utf-8') as f:
+              json.dump({'word': new_word, 'last': current_word, 'updated': updated},
+                        f, ensure_ascii=False, indent=2)
+              f.write('\n')
+
+          print(f'{current_word} → {new_word}  ({updated} KST)')
+          PYEOF
+
+      - name: 커밋 및 푸시
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add word.json
+          git diff --cached --quiet || git commit -m "단어 자동 갱신 $(TZ=Asia/Seoul date +'%Y-%m-%d %H:%M')"
+          git push
