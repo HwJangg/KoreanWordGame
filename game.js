@@ -383,7 +383,7 @@ function _shareResult() {
     const grid = gameHistory.map(row =>
         row.map(({color}) => color === 'green' ? '🟩' : color === 'yellow' ? '🟨' : '⬛').join('')
     ).join('\n');
-    const url = isChallenge ? '' : '\nhttps://hwjangg.github.io/KoreanWordGame/';
+    const url = isChallenge ? '\n' + location.href : '\nhttps://hwjangg.github.io/KoreanWordGame/';
     const text = `${title}\n${grid}${url}`;
 
     navigator.clipboard.writeText(text).then(() => {
