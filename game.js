@@ -603,7 +603,7 @@ function init() {
 
         const makeBtn = document.getElementById('make-btn');
         if (makeBtn) {
-            makeBtn.style.cssText = btnCss + 'display:block;';
+            makeBtn.style.cssText = btnCss;
             makeBtn.onmouseenter = () => makeBtn.style.filter = 'brightness(1.4)';
             makeBtn.onmouseleave = () => makeBtn.style.filter = '';
             endRow.appendChild(makeBtn);
