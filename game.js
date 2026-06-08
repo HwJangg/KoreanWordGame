@@ -595,7 +595,8 @@ function _showAnswerModal() {
 
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
-        cell.style.cssText = 'display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;';
+        const isCurrent = h === kstHour;
+        cell.style.cssText = `display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;${isCurrent ? 'border:1px solid #565758;' : 'border:1px solid transparent;'}`;
 
         const hSpan = document.createElement('span');
         hSpan.textContent = `${h}시`;
