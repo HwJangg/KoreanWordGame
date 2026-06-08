@@ -105,6 +105,7 @@ function _loadGame() {
         if (s.gameOver) {
             setMsg(s.endMsg, s.endType);
             $submitBtn.style.display = 'none';
+            _showShareBtn();
             if ($restartBtn) $restartBtn.style.display = '';
             const makeBtn = document.getElementById('make-btn');
             if (makeBtn) {
@@ -378,11 +379,48 @@ function setMsg(text, type = '') {
     el.className   = type;
 }
 
+function _showShareBtn() {
+    const btn = document.getElementById('share-result-btn');
+    if (btn) btn.style.display = '';
+}
+
+function _shareResult() {
+    const won = gameHistory.length > 0 && gameHistory[gameHistory.length - 1].every(r => r.color === 'green');
+    const isChallenge = !!new URLSearchParams(location.search).get('w');
+    const title = isChallenge
+        ? (won ? `단어 도전 성공 ${gameHistory.length}/${MAX}` : `단어 도전 실패 X/${MAX}`)
+        : (won ? `오늘의 단어 ${gameHistory.length}/${MAX}` : `오늘의 단어 X/${MAX}`);
+    const grid = gameHistory.map(row =>
+        row.map(({color}) => color === 'green' ? '🟩' : color === 'yellow' ? '🟨' : '⬛').join('')
+    ).join('\n');
+    const url = isChallenge ? location.href : 'https://hwjangg.github.io/KoreanWordGame/';
+    const text = `${title}\n${grid}\n${url}`;
+
+    if (navigator.share) {
+        navigator.share({ text }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(text).then(() => {
+            let toast = document.getElementById('game-toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'game-toast';
+                toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#538d4e;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
+                document.body.appendChild(toast);
+            }
+            toast.textContent = '결과가 복사되었습니다';
+            toast.style.opacity = '1';
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+        });
+    }
+}
+
 function endGame(msg, type) {
     gameOver = true;
     setMsg(msg, type);
     _saveGame(msg, type);
     $submitBtn.style.display = 'none';
+    _showShareBtn();
     const makeBtn = document.getElementById('make-btn');
     if (makeBtn) {
         makeBtn.style.display = 'block';
@@ -570,6 +608,19 @@ function init() {
     if (makeBtn) makeBtn.style.display = 'none';
 
     _injectRules();
+
+    // 결과 공유 버튼 (게임 종료 후 표시)
+    if (!document.getElementById('share-result-btn')) {
+        const shareBtn = document.createElement('button');
+        shareBtn.id = 'share-result-btn';
+        shareBtn.textContent = '결과 공유';
+        shareBtn.style.cssText = 'display:none;width:100%;max-width:480px;padding:13px;margin-top:8px;font-size:1rem;font-weight:700;background:#538d4e;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;';
+        shareBtn.onmouseenter = () => shareBtn.style.filter = 'brightness(1.15)';
+        shareBtn.onmouseleave = () => shareBtn.style.filter = '';
+        shareBtn.onclick = _shareResult;
+        $submitBtn.insertAdjacentElement('afterend', shareBtn);
+    }
+
     buildBoard();
     buildKeyboard();
     cacheCells();
