@@ -70,10 +70,15 @@ function _today() {
     return new Date().toISOString().slice(0, 10);
 }
 
+// 공유 게임 세션 기준: 한국 시간 새벽 6시 초기화 (= UTC 21:00)
+function _sessionDay() {
+    return new Date(Date.now() - 21 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
 function _saveGame(endMsg, endType) {
     if (!_saveKey) return;
     localStorage.setItem(_saveKey, JSON.stringify({
-        date: _today(), answer,
+        date: _sessionDay(), answer,
         history: gameHistory, attempt, gameOver, jamoState,
         endMsg: endMsg || '', endType: endType || ''
     }));
@@ -89,7 +94,7 @@ function _loadGame() {
         if (_saveKey === 'daily') {
             if (s.answer !== answer) { localStorage.removeItem(_saveKey); return false; }
         } else {
-            if (s.date !== _today()) { localStorage.removeItem(_saveKey); return false; }
+            if (s.date !== _sessionDay()) { localStorage.removeItem(_saveKey); return false; }
         }
         s.history.forEach((result, i) => { reveal(i, result, true); updateKeyboard(result); });
         gameHistory = s.history;
