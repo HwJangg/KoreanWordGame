@@ -625,7 +625,8 @@ function _showAnswerModal() {
 }
 
 function _injectAnswerBtn() {
-    if (new URLSearchParams(location.search).get('w') !== null) return;
+    const path = location.pathname;
+    if (!path.endsWith('/') && !path.endsWith('index.html')) return;
     if (document.getElementById('answer-reveal-btn')) return;
     const kstHour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
     if (kstHour >= 23) return;
