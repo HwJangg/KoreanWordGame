@@ -396,23 +396,19 @@ function _shareResult() {
     const url = isChallenge ? '' : '\nhttps://hwjangg.github.io/KoreanWordGame/';
     const text = `${title}\n${grid}${url}`;
 
-    if (navigator.share) {
-        navigator.share({ text }).catch(() => {});
-    } else {
-        navigator.clipboard.writeText(text).then(() => {
-            let toast = document.getElementById('game-toast');
-            if (!toast) {
-                toast = document.createElement('div');
-                toast.id = 'game-toast';
-                toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#538d4e;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
-                document.body.appendChild(toast);
-            }
-            toast.textContent = '결과가 복사되었습니다';
-            toast.style.opacity = '1';
-            clearTimeout(toast._t);
-            toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
-        });
-    }
+    navigator.clipboard.writeText(text).then(() => {
+        let toast = document.getElementById('game-toast');
+        if (!toast) {
+            toast = document.createElement('div');
+            toast.id = 'game-toast';
+            toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#538d4e;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
+            document.body.appendChild(toast);
+        }
+        toast.textContent = '게임 결과가 복사되었습니다';
+        toast.style.opacity = '1';
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    });
 }
 
 function endGame(msg, type) {
