@@ -22,12 +22,16 @@ const VALID_3VOWEL = new Set(JUNG_KEYS.filter(k => k.length === 3));
 const JAMO_START   = 0x3131;
 const JAMO_END     = 0x3163;
 
-// 두벌식 키보드 배열 (쌍자음·겹모음 제외)
+// 두벌식 키보드 배열
 const DUBEOLSIK = {
-    q:'ㅂ',w:'ㅈ',e:'ㄷ',r:'ㄱ',t:'ㅅ',y:'ㅛ',u:'ㅕ',i:'ㅑ',
+    q:'ㅂ',w:'ㅈ',e:'ㄷ',r:'ㄱ',t:'ㅅ',y:'ㅛ',u:'ㅕ',i:'ㅑ',o:'ㅐ',p:'ㅔ',
     a:'ㅁ',s:'ㄴ',d:'ㅇ',f:'ㄹ',g:'ㅎ',h:'ㅗ',j:'ㅓ',k:'ㅏ',l:'ㅣ',
-    z:'ㅋ',x:'ㅌ',c:'ㅊ',v:'ㅍ',b:'ㅠ',n:'ㅜ',m:'ㅡ'
+    z:'ㅋ',x:'ㅌ',c:'ㅊ',v:'ㅍ',b:'ㅠ',n:'ㅜ',m:'ㅡ',
+    O:'ㅒ', P:'ㅖ'
 };
+
+// 겹모음 → 두 자모 순차 입력으로 분해
+const COMPOUND_JAMO = { 'ㅐ':['ㅏ','ㅣ'], 'ㅔ':['ㅓ','ㅣ'], 'ㅒ':['ㅑ','ㅣ'], 'ㅖ':['ㅕ','ㅣ'] };
 
 const KEYBOARD_ROWS = [
     ['ㅂ','ㅈ','ㄷ','ㄱ','ㅅ','ㅛ','ㅕ','ㅑ','←'],
@@ -223,6 +227,16 @@ function _imeBackstep() {
             s.jung = Math.floor((off % (21 * 28)) / 28);
             s.jong = off % 28;
         }
+    }
+}
+
+function imeInputExpanded(jamo) {
+    const parts = COMPOUND_JAMO[jamo];
+    if (parts) {
+        imeInput(parts[0]);
+        if (imeJamo().length < 5) imeInput(parts[1]);
+    } else {
+        imeInput(jamo);
     }
 }
 
@@ -626,5 +640,5 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Enter') { submit(); return; }
     if (e.key === 'Backspace') { e.preventDefault(); imeBackspace(); return; }
     const jamo = DUBEOLSIK[e.key];
-    if (jamo) { e.preventDefault(); imeInput(jamo); }
+    if (jamo) { e.preventDefault(); imeInputExpanded(jamo); }
 });
