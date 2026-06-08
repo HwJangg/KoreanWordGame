@@ -671,7 +671,7 @@ function init() {
     } else if (hasShareParam) {
         showInvalidLink();
     } else {
-        fetch('word.json?v=' + Date.now(), { cache: 'no-store' })
+        fetch('https://raw.githubusercontent.com/HwJangg/KoreanWordGame/master/word.json?v=' + Date.now(), { cache: 'no-store' })
             .then(r => r.json())
             .then(data => {
                 answer = data.word;
