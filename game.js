@@ -593,10 +593,12 @@ function _showAnswerModal() {
     const rightCol = document.createElement('div');
     rightCol.style.cssText = 'flex:1;';
 
+    const won = gameOver && gameHistory.length > 0 && gameHistory[gameHistory.length - 1].every(r => r.color === 'green');
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
-        cell.style.cssText = `display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;${isCurrent ? 'border:1px solid #565758;' : 'border:1px solid transparent;'}`;
+        const borderColor = isCurrent ? (won ? '#538d4e' : '#565758') : 'transparent';
+        cell.style.cssText = `display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;border:1px solid ${borderColor};`;
 
         const hSpan = document.createElement('span');
         hSpan.textContent = `${h}시`;
