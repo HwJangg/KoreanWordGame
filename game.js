@@ -544,10 +544,10 @@ function _injectRules() {
 
     box.innerHTML = `
         <h2 style="font-size:1rem;margin-bottom:14px;text-align:center;letter-spacing:1px;">게임 규칙</h2>
-        <p style="font-size:0.82rem;color:#818384;margin-bottom:18px;line-height:1.6;text-align:center;">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 자모의 색으로 힌트를 확인하세요.</p>
-        ${row('ㅏ', '#538d4e', '정확한 자리의 자모')}
-        ${row('ㄱ', '#b59f3b', '단어에 있지만 자리가 다른 자모')}
-        ${row('ㅎ', '#3a3a3c', '단어에 없는 자모')}
+        <p style="font-size:0.82rem;color:#818384;margin-bottom:18px;line-height:1.6;text-align:center;">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 글자의 색으로 힌트를 확인하세요.</p>
+        ${row('ㅏ', '#538d4e', '정확한 자리의 글자')}
+        ${row('ㄱ', '#b59f3b', '단어에 있지만 자리가 다른 글자')}
+        ${row('ㅎ', '#3a3a3c', '단어에 없는 글자')}
         <button id="rules-ok-btn" style="width:100%;padding:10px;margin-top:10px;background:#538d4e;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>`;
 
     modal.appendChild(box);
