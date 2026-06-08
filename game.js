@@ -391,7 +391,7 @@ function _shareResult() {
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'game-toast';
-            toast.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:#538d4e;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
+            toast.style.cssText = 'position:fixed;top:55px;left:50%;transform:translateX(-50%);background:#538d4e;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
             document.body.appendChild(toast);
         }
         toast.textContent = '게임 결과가 복사되었습니다';
@@ -590,7 +590,7 @@ function init() {
         endRow.id = 'end-btn-row';
         endRow.style.cssText = 'display:none;width:100%;max-width:480px;gap:8px;margin-top:8px;box-sizing:border-box;';
 
-        const btnCss = 'flex:1;padding:13px;font-size:1rem;font-weight:700;background:#3a3a3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;text-align:center;text-decoration:none;box-sizing:border-box;';
+        const btnCss = 'flex:1;min-width:0;padding:13px;font-size:1rem;font-weight:700;background:#3a3a3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;text-align:center;text-decoration:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1.2;';
 
         const shareBtn = document.createElement('button');
         shareBtn.id = 'share-result-btn';
