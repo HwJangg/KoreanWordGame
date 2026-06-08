@@ -620,10 +620,16 @@ function init() {
             .then(r => r.json())
             .then(data => {
                 answer = data.word;
-                $submitBtn.onclick   = submit;
-                $submitBtn.disabled  = false;
                 document.getElementById('recent-answer').textContent = '최근 정답: ' + data.last;
                 document.getElementById('words-updated').textContent = '단어 업데이트: ' + data.updated;
+                _saveKey = 'daily_' + answer;
+                for (const k of [...Object.keys(localStorage)]) {
+                    if (k.startsWith('daily_') && k !== _saveKey) localStorage.removeItem(k);
+                }
+                if (!_loadGame()) {
+                    $submitBtn.onclick  = submit;
+                    $submitBtn.disabled = false;
+                }
             });
     }
 }
