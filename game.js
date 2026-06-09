@@ -618,6 +618,16 @@ function _saveHourResult(result) {
     localStorage.setItem('hour_results', JSON.stringify({ date, results }));
 }
 
+function _cleanupStaleStorage() {
+    const today = _kstDateStr();
+    ['daily', 'hour_results'].forEach(key => {
+        try {
+            const saved = JSON.parse(localStorage.getItem(key) || '{}');
+            if (saved.date && saved.date !== today) localStorage.removeItem(key);
+        } catch { localStorage.removeItem(key); }
+    });
+}
+
 function _loadHourResults() {
     try {
         const saved = JSON.parse(localStorage.getItem('hour_results') || '{}');
@@ -722,6 +732,7 @@ function _injectAnswerBtn() {
 }
 
 function init() {
+    _cleanupStaleStorage();
     attempt  = 0;
     gameOver = false;
     jamoState = {};
