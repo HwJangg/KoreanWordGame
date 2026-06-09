@@ -651,32 +651,34 @@ function _showAnswerModal() {
     const rightCol = document.createElement('div');
     rightCol.style.cssText = 'flex:1;';
 
-    const won = gameOver && gameHistory.length > 0 && gameHistory[gameHistory.length - 1].every(r => r.color === 'green');
     const hourResults = _loadHourResults();
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
-        const borderColor = 'transparent';
-        cell.style.cssText = `display:flex;align-items:center;gap:18px;padding:0 5px;border-radius:4px;border:1px solid ${borderColor};height:28px;box-sizing:border-box;`;
+        cell.style.cssText = `display:flex;align-items:center;gap:18px;padding:0 5px;border-radius:4px;border:1px solid transparent;height:28px;box-sizing:border-box;`;
+
+        const r = hourResults[String(h)];
 
         const hSpan = document.createElement('span');
         hSpan.textContent = `${h}시`;
-        const hColor = isCurrent
-            ? (gameOver ? (won ? C.green : '#ff6b6b') : (gameHistory.length > 0 ? C.yellow : '#fff'))
-            : (hourResults[String(h)] === 'yellow' ? C.yellow : C.muted);
+        let hColor;
+        if (h > kstHour)       hColor = C.muted;
+        else if (r === 'green') hColor = C.green;
+        else if (r === 'red')   hColor = '#ff6b6b';
+        else if (r === 'yellow') hColor = C.yellow;
+        else                    hColor = isCurrent ? '#fff' : C.muted;
         hSpan.style.cssText = `font-size:0.75rem;color:${hColor};min-width:26px;text-align:right;font-weight:${isCurrent ? '700' : '400'};`;
 
         const wSpan = document.createElement('span');
         let wordText = '', wordColor = '#aaa';
         if (h < kstHour) {
             wordText = todayWords[String(h)] || '—';
-            const r = hourResults[String(h)];
-            if (r === 'green') wordColor = C.green;
-            else if (r === 'red') wordColor = '#ff6b6b';
-            else if (r === 'yellow') wordColor = C.yellow;
-        } else if (h === kstHour && gameOver) {
+            if (r === 'green')        wordColor = C.green;
+            else if (r === 'red')     wordColor = '#ff6b6b';
+            else if (r === 'yellow')  wordColor = C.yellow;
+        } else if (h === kstHour && (r === 'green' || r === 'red')) {
             wordText = answer;
-            wordColor = won ? C.green : '#ff6b6b';
+            wordColor = r === 'green' ? C.green : '#ff6b6b';
         }
         wSpan.textContent = wordText;
         wSpan.style.cssText = `font-size:0.88rem;color:${wordColor};font-weight:${isCurrent ? '700' : '400'};`;
