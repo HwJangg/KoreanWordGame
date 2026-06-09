@@ -2,8 +2,11 @@
   "word": "아국",
   "last": "나냥",
   "updated": "2026-06-09 22:00",
-  "share_total": 4,
-  "share_today": { "date": "2026-06-09", "count": 4 },
+  "share_total": 5,
+  "share_today": {
+    "date": "2026-06-09",
+    "count": 5
+  },
   "today_date": "2026-06-09",
   "today_words": {
     "2": "두국",
