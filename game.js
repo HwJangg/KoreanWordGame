@@ -654,7 +654,7 @@ function _showAnswerModal() {
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
-        const borderColor = isCurrent ? (won ? C.green : C.border) : 'transparent';
+        const borderColor = 'transparent';
         cell.style.cssText = `display:flex;align-items:center;gap:6px;padding:0 5px;border-radius:4px;border:1px solid ${borderColor};height:28px;box-sizing:border-box;`;
 
         const hSpan = document.createElement('span');
