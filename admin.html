@@ -323,7 +323,7 @@ async function fetchStats() {
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
         const [r, rShare] = await Promise.all([
-            fetch(`${base}?daily=true&exclude_paths=share-generated,/KoreanWordGame/share,/KoreanWordGame/share.html&path_by_name=true`, { headers }),
+            fetch(`${base}?daily=true`, { headers }),
             fetch(`${base}?daily=true&include_paths=share-generated&path_by_name=true`, { headers })
         ]);
         if (!r.ok) {
@@ -337,17 +337,21 @@ async function fetchStats() {
         const d = await r.json();
         const dShare = rShare.ok ? await rShare.json() : { hits: [] };
 
-        const sumToday = (data) => {
+        const isPlay = (h) => !h.event && h.path !== '/KoreanWordGame/share' && h.path !== '/KoreanWordGame/share.html';
+
+        const sumToday = (data, filter) => {
             let n = 0;
             for (const hit of (data.hits || []))
-                for (const stat of (hit.stats || []))
-                    if ((stat.day || '').startsWith(today)) n += stat.daily || 0;
+                if (!filter || filter(hit))
+                    for (const stat of (hit.stats || []))
+                        if ((stat.day || '').startsWith(today)) n += stat.daily || 0;
             return n;
         };
-        const sumTotal = (data) => (data.hits || []).reduce((s, h) => s + (h.count || 0), 0);
+        const sumTotal = (data, filter) =>
+            (data.hits || []).filter(h => !filter || filter(h)).reduce((s, h) => s + (h.count || 0), 0);
 
-        document.getElementById('stat-today').textContent = sumToday(d).toLocaleString();
-        document.getElementById('stat-total').textContent = sumTotal(d).toLocaleString();
+        document.getElementById('stat-today').textContent = sumToday(d, isPlay).toLocaleString();
+        document.getElementById('stat-total').textContent = sumTotal(d, isPlay).toLocaleString();
         document.getElementById('stat-share-today').textContent = sumToday(dShare).toLocaleString();
         document.getElementById('stat-share-total').textContent = sumTotal(dShare).toLocaleString();
     } catch(e) {
