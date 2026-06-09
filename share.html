@@ -248,7 +248,10 @@ window.generateLink = function() {
     const isNewLink = linkTextEl.textContent !== url;
     linkTextEl.textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
-    if (isNewLink) _incrementShare();
+    if (isNewLink) {
+        _incrementShare();
+        new Image().src = 'https://scentofgrasse.goatcounter.com/count?' + new URLSearchParams({ p: 'share-generated', t: '링크 발행', e: '1', ns: '1', rnd: Math.random().toString(36).substr(2, 5), r: document.referrer || '' });
+    }
     navigator.clipboard.writeText(url).then(() => {
         const toast = document.getElementById('toast');
         toast.classList.add('show');
