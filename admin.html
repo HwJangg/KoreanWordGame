@@ -308,24 +308,26 @@ async function fetchStats() {
         const headers = { Authorization: `Bearer ${GC_TOKEN}` };
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
-        const rToday = await fetch(`${base}?start=${today}&end=${today}`, { headers });
-        const rTotal = await fetch(`${base}?start=2020-01-01&end=${today}`, { headers });
-
-        if (!rToday.ok) {
-            const err = await rToday.text();
-            addLog(`통계 오류 ${rToday.status}: ${err}`, 'err');
+        const r = await fetch(`${base}?daily=true`, { headers });
+        if (!r.ok) {
+            const err = await r.text();
+            addLog(`통계 오류 ${r.status}: ${err}`, 'err');
             document.getElementById('stat-today').textContent = '—';
             document.getElementById('stat-total').textContent = '—';
             return;
         }
 
-        const dToday = await rToday.json();
-        const dTotal = await rTotal.json();
+        const d = await r.json();
+        let todayCount = 0, totalCount = 0;
+        for (const hit of (d.hits || [])) {
+            totalCount += hit.count || 0;
+            for (const stat of (hit.stats || [])) {
+                if ((stat.day || '').startsWith(today)) todayCount += stat.count || 0;
+            }
+        }
 
-        const sumCount = d => (d.hits || []).reduce((s, h) => s + (h.count || 0), 0);
-
-        document.getElementById('stat-today').textContent = sumCount(dToday).toLocaleString();
-        document.getElementById('stat-total').textContent = sumCount(dTotal).toLocaleString();
+        document.getElementById('stat-today').textContent = todayCount.toLocaleString();
+        document.getElementById('stat-total').textContent = totalCount.toLocaleString();
     } catch(e) {
         addLog(`통계 오류: ${e.message}`, 'err');
         document.getElementById('stat-today').textContent = '—';
