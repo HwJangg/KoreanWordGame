@@ -620,12 +620,14 @@ function _saveHourResult(result) {
 
 function _cleanupStaleStorage() {
     const today = _kstDateStr();
-    ['daily', 'hour_results'].forEach(key => {
-        try {
-            const saved = JSON.parse(localStorage.getItem(key) || '{}');
-            if (saved.date && saved.date !== today) localStorage.removeItem(key);
-        } catch { localStorage.removeItem(key); }
-    });
+    Object.keys(localStorage)
+        .filter(k => k === 'daily' || k === 'hour_results' || k.startsWith('play_'))
+        .forEach(key => {
+            try {
+                const saved = JSON.parse(localStorage.getItem(key) || '{}');
+                if (saved.date && saved.date !== today) localStorage.removeItem(key);
+            } catch { localStorage.removeItem(key); }
+        });
 }
 
 function _loadHourResults() {
