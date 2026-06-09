@@ -345,6 +345,7 @@ function updateCurrentRow() {
         $cells[c].className   = jamo[c] ? 'cell preview' : 'cell';
         $cells[c].style.background = '';
         $cells[c].style.borderColor = '';
+        $cells[c].style.color = '';
     }
     const full = jamo.length >= 5;
     $keyboard.classList.toggle('kb-full', full);
@@ -356,8 +357,7 @@ function updateCurrentRow() {
             (jamoWordSet && jamoWordSet.has(decomposeJamo(guess).join('')));
         if (!inDict) {
             for (let c = 0; c < 5; c++) {
-                $cells[c].style.background = '#ff6b6b';
-                $cells[c].style.borderColor = '#ff6b6b';
+                $cells[c].style.color = '#ff6b6b';
             }
             setMsg('사전에 없는 단어입니다', 'error');
             $submitBtn.disabled = true;
