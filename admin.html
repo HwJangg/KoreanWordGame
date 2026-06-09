@@ -327,11 +327,11 @@ async function saveToken() {
 
 async function fetchStats() {
     try {
-        const today = new Date().toISOString().slice(0, 10);
         const headers = { Authorization: `Bearer ${GC_TOKEN}` };
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
         const kstToday = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+        const today = kstToday;
 
         const [r, rShare, wjR] = await Promise.all([
             fetch(`${base}?daily=true`, { headers }),
