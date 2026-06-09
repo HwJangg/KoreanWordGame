@@ -655,7 +655,7 @@ function _showAnswerModal() {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
         const borderColor = 'transparent';
-        cell.style.cssText = `display:flex;align-items:center;gap:12px;padding:0 5px;border-radius:4px;border:1px solid ${borderColor};height:28px;box-sizing:border-box;`;
+        cell.style.cssText = `display:flex;align-items:center;gap:18px;padding:0 5px;border-radius:4px;border:1px solid ${borderColor};height:28px;box-sizing:border-box;`;
 
         const hSpan = document.createElement('span');
         hSpan.textContent = `${h}시`;
