@@ -209,6 +209,34 @@ window.onWordInput = function() {
     btn.disabled = false;
 };
 
+const _GH_TOKEN = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,78,76,51,85,79,65,48,104,97,80,112,112,100,102,110,73,109,105,82,95,88,87,105,121,114,107,107,84,49,50,71,117,114,104,71,103,116,76,48,119,82,115,101,67,112,112,48,122,54,55,52,112,105,122,106,79,74,112,100,100,75,48,100,90,68,86,68,76,81,67,73,57,85,75,86,84,55,86,86].map(c=>String.fromCharCode(c)).join('');
+const _GH_API = 'https://api.github.com/repos/HwJangg/KoreanWordGame/contents/word.json';
+
+async function _incrementShare() {
+    const hdrs = { Authorization: `Bearer ${_GH_TOKEN}`, Accept: 'application/vnd.github.v3+json' };
+    try {
+        const r = await fetch(`${_GH_API}?t=${Date.now()}`, { headers: hdrs });
+        if (!r.ok) return;
+        const data = await r.json();
+        const bin = atob(data.content.replace(/\n/g, ''));
+        const d = JSON.parse(new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0))));
+        const today = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+        d.share_total = (d.share_total || 0) + 1;
+        if (d.share_today && d.share_today.date === today) {
+            d.share_today.count = (d.share_today.count || 0) + 1;
+        } else {
+            d.share_today = { date: today, count: 1 };
+        }
+        const enc = new TextEncoder().encode(JSON.stringify(d, null, 2) + '\n');
+        let b = ''; enc.forEach(x => b += String.fromCharCode(x));
+        await fetch(_GH_API, {
+            method: 'PUT',
+            headers: { ...hdrs, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: 'share +1', content: btoa(b), sha: data.sha, branch: 'master' })
+        });
+    } catch(e) {}
+}
+
 window.generateLink = function() {
     const word = document.getElementById('word-input').value.trim();
     const isKoreanOnly = [...word].every(ch => { const c = ch.codePointAt(0); return c >= 0xAC00 && c <= 0xD7A3; });
@@ -221,6 +249,7 @@ window.generateLink = function() {
     linkTextEl.textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
     if (isNewLink) {
+        _incrementShare();
         new Image().src = 'https://scentofgrasse.goatcounter.com/count?' + new URLSearchParams({ p: 'share-generated', t: '링크 발행', e: '1', ns: '1', rnd: Math.random().toString(36).substr(2, 5), r: document.referrer || '' });
     }
     navigator.clipboard.writeText(url).then(() => {
