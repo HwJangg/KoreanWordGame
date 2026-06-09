@@ -218,6 +218,7 @@ window.generateLink = function() {
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
+    if (window.goatcounter) window.goatcounter.count({ path: 'share-generated', title: '링크 발행', event: true });
     navigator.clipboard.writeText(url).then(() => {
         const toast = document.getElementById('toast');
         toast.classList.add('show');
@@ -235,5 +236,6 @@ window.copyLink = function() {
 };
 }());
 </script>
+<script data-goatcounter="https://scentofgrasse.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body>
 </html>

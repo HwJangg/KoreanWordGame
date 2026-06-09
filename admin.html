@@ -134,6 +134,14 @@
         <span class="info-label">누적 플레이</span>
         <span class="info-value" id="stat-total">—</span>
     </div>
+    <div class="info-row">
+        <span class="info-label">오늘 발행</span>
+        <span class="info-value" id="stat-share-today">—</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">누적 발행</span>
+        <span class="info-value" id="stat-share-total">—</span>
+    </div>
 </div>
 
 <!-- 현재 상태 -->
@@ -308,7 +316,10 @@ async function fetchStats() {
         const headers = { Authorization: `Bearer ${GC_TOKEN}` };
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
-        const r = await fetch(`${base}?daily=true`, { headers });
+        const [r, rShare] = await Promise.all([
+            fetch(`${base}?daily=true`, { headers }),
+            fetch(`${base}?daily=true&path=share-generated`, { headers })
+        ]);
         if (!r.ok) {
             const err = await r.text();
             addLog(`통계 오류 ${r.status}: ${err}`, 'err');
@@ -318,16 +329,21 @@ async function fetchStats() {
         }
 
         const d = await r.json();
-        let todayCount = 0, totalCount = 0;
-        for (const hit of (d.hits || [])) {
-            totalCount += hit.count || 0;
-            for (const stat of (hit.stats || [])) {
-                if ((stat.day || '').startsWith(today)) todayCount += stat.daily || 0;
-            }
-        }
+        const dShare = rShare.ok ? await rShare.json() : { hits: [] };
 
-        document.getElementById('stat-today').textContent = todayCount.toLocaleString();
-        document.getElementById('stat-total').textContent = totalCount.toLocaleString();
+        const sumToday = (data) => {
+            let n = 0;
+            for (const hit of (data.hits || []))
+                for (const stat of (hit.stats || []))
+                    if ((stat.day || '').startsWith(today)) n += stat.daily || 0;
+            return n;
+        };
+        const sumTotal = (data) => (data.hits || []).reduce((s, h) => s + (h.count || 0), 0);
+
+        document.getElementById('stat-today').textContent = sumToday(d).toLocaleString();
+        document.getElementById('stat-total').textContent = sumTotal(d).toLocaleString();
+        document.getElementById('stat-share-today').textContent = sumToday(dShare).toLocaleString();
+        document.getElementById('stat-share-total').textContent = sumTotal(dShare).toLocaleString();
     } catch(e) {
         addLog(`통계 오류: ${e.message}`, 'err');
         document.getElementById('stat-today').textContent = '—';
