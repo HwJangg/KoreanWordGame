@@ -323,9 +323,11 @@ async function fetchStats() {
         const headers = { Authorization: `Bearer ${GC_TOKEN}` };
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
-        const [r, rShare] = await Promise.all([
+        const kstToday = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+
+        const [r, wjR] = await Promise.all([
             fetch(`${base}?daily=true`, { headers }),
-            fetch(`${base}?daily=true&include_paths=share-generated&path_by_name=true`, { headers })
+            fetch(`https://raw.githubusercontent.com/HwJangg/KoreanWordGame/master/word.json?t=${Date.now()}`)
         ]);
         if (!r.ok) {
             const err = await r.text();
@@ -336,7 +338,6 @@ async function fetchStats() {
         }
 
         const d = await r.json();
-        const dShare = rShare.ok ? await rShare.json() : { hits: [] };
 
         const isPlay = (h) => !h.event && h.path !== '/KoreanWordGame/share' && h.path !== '/KoreanWordGame/share.html';
 
@@ -353,8 +354,16 @@ async function fetchStats() {
 
         document.getElementById('stat-today').textContent = sumToday(d, isPlay).toLocaleString();
         document.getElementById('stat-total').textContent = sumTotal(d, isPlay).toLocaleString();
-        document.getElementById('stat-share-today').textContent = sumToday(dShare).toLocaleString();
-        document.getElementById('stat-share-total').textContent = sumTotal(dShare).toLocaleString();
+
+        if (wjR.ok) {
+            const wj = await wjR.json();
+            document.getElementById('stat-share-total').textContent = (wj.share_total || 0).toLocaleString();
+            const shareToday = (wj.share_today && wj.share_today.date === kstToday) ? wj.share_today.count : 0;
+            document.getElementById('stat-share-today').textContent = shareToday.toLocaleString();
+        } else {
+            document.getElementById('stat-share-today').textContent = '—';
+            document.getElementById('stat-share-total').textContent = '—';
+        }
     } catch(e) {
         addLog(`통계 오류: ${e.message}`, 'err');
         document.getElementById('stat-today').textContent = '—';
