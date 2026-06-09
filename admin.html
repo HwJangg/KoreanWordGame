@@ -403,6 +403,11 @@ async function doSubmit() {
 window.onload = () => {
     const input = document.getElementById('token-input');
     input.addEventListener('keydown', e => { if (e.key === 'Enter') saveToken(); });
+
+    const statsEl = document.getElementById('sec-stats');
+    statsEl.style.display = 'flex';
+    fetchStats();
+
     if (sessionStorage.getItem('authed')) saveToken();
 };
 </script>
