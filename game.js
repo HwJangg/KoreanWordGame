@@ -72,6 +72,7 @@ let answer, attempt, gameOver;
 let jamoState = {};
 let ime = { done: '', cho: -1, jung: -1, jong: 0 };
 let wordSet = null;
+let jamoWordSet = null;
 let gameHistory = [];
 let _saveKey = null;
 let todayWords = {};
@@ -162,8 +163,11 @@ function validateGuess(guess) {
     if (dubeolKeys.length !== 5)
         return `자모 ${dubeolKeys.length}개 (5개 필요)`;
 
-    if (wordSet && !wordSet.has(guess))
-        return '사전에 없는 단어입니다';
+    if (wordSet && !wordSet.has(guess)) {
+        const gJamo = decomposeJamo(guess).join('');
+        if (!jamoWordSet || !jamoWordSet.has(gJamo))
+            return '사전에 없는 단어입니다';
+    }
 
     if (VOWEL_CHARS.has(dubeolKeys[0]))
         return '모음으로 시작할 수 없습니다';
@@ -309,7 +313,7 @@ function imeInput(jamo) {
         } else if (s.jung < 0) {
             const compCho = CCHO[`${s.cho},${cc}`];
             if (compCho !== undefined) { s.cho = compCho; }
-            else { s.done += CHO_CHARS[s.cho]; s.cho = cc; s.jong = 0; }
+            else { s.cho = cc; s.jong = 0; }
         } else if (s.jong === 0) {
             if (jc > 0) s.jong = jc;
             else { s.done += makeSyl(s.cho, s.jung, 0); s.cho = cc; s.jung = -1; s.jong = 0; }
@@ -339,10 +343,30 @@ function updateCurrentRow() {
     for (let c = 0; c < 5; c++) {
         $cells[c].textContent = jamo[c] || '';
         $cells[c].className   = jamo[c] ? 'cell preview' : 'cell';
+        $cells[c].style.background = '';
+        $cells[c].style.borderColor = '';
     }
     const full = jamo.length >= 5;
     $keyboard.classList.toggle('kb-full', full);
     $submitBtn.disabled = !full;
+
+    if (full && wordSet) {
+        const guess = imeDisplay().trim();
+        const inDict = wordSet.has(guess) ||
+            (jamoWordSet && jamoWordSet.has(decomposeJamo(guess).join('')));
+        if (!inDict) {
+            for (let c = 0; c < 5; c++) {
+                $cells[c].style.background = '#ff6b6b';
+                $cells[c].style.borderColor = '#ff6b6b';
+            }
+            setMsg('사전에 없는 단어입니다', 'error');
+            $submitBtn.disabled = true;
+        } else {
+            setMsg('');
+        }
+    } else {
+        setMsg('');
+    }
 }
 
 function buildBoard() {
@@ -714,7 +738,10 @@ function init() {
     // 사전 로드 (비동기, 추측 제출 전까지만 완료되면 됨)
     fetch('dict.json?v=2')
         .then(r => r.json())
-        .then(data => { wordSet = new Set(data); });
+        .then(data => {
+            wordSet = new Set(data);
+            jamoWordSet = new Set(data.map(w => decomposeJamo(w).join('')));
+        });
 
     const shareWord = getShareWord();
     const hasShareParam = !!new URLSearchParams(location.search).get('w');
