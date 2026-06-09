@@ -660,7 +660,7 @@ function _showAnswerModal() {
         const hSpan = document.createElement('span');
         hSpan.textContent = `${h}시`;
         const hColor = isCurrent
-            ? (gameOver ? (won ? C.green : '#ff6b6b') : '#fff')
+            ? (gameOver ? (won ? C.green : '#ff6b6b') : (gameHistory.length > 0 ? C.yellow : '#fff'))
             : C.muted;
         hSpan.style.cssText = `font-size:0.75rem;color:${hColor};min-width:26px;text-align:right;font-weight:${isCurrent ? '700' : '400'};`;
 
