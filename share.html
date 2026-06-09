@@ -218,7 +218,11 @@ window.generateLink = function() {
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
-    new Image().src = 'https://scentofgrasse.goatcounter.com/count?p=share-generated&t=' + encodeURIComponent('링크 발행') + '&e=1&r=' + encodeURIComponent(document.referrer || '');
+    (function() {
+        var _d = new URLSearchParams({ p: 'share-generated', t: '링크 발행', e: 'true', no_session: 'true', r: document.referrer || '' });
+        if (navigator.sendBeacon) { navigator.sendBeacon('https://scentofgrasse.goatcounter.com/count', _d); }
+        else { new Image().src = 'https://scentofgrasse.goatcounter.com/count?' + _d; }
+    }());
     navigator.clipboard.writeText(url).then(() => {
         const toast = document.getElementById('toast');
         toast.classList.add('show');
