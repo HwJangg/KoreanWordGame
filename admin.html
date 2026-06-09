@@ -125,22 +125,27 @@
 </div>
 
 <!-- 방문자 통계 -->
-<div class="card hidden" id="sec-stats">
-    <div class="info-row">
-        <span class="info-label">오늘 플레이</span>
-        <span class="info-value" id="stat-today">—</span>
+<div class="card hidden" id="sec-stats" style="display:none;flex-direction:row;gap:0;padding:0;">
+    <div style="flex:1;padding:22px;">
+        <div class="info-row">
+            <span class="info-label">오늘 플레이</span>
+            <span class="info-value" id="stat-today">—</span>
+        </div>
+        <div class="info-row" style="border-bottom:none;">
+            <span class="info-label">누적 플레이</span>
+            <span class="info-value" id="stat-total">—</span>
+        </div>
     </div>
-    <div class="info-row">
-        <span class="info-label">누적 플레이</span>
-        <span class="info-value" id="stat-total">—</span>
-    </div>
-    <div class="info-row">
-        <span class="info-label">오늘 발행</span>
-        <span class="info-value" id="stat-share-today">—</span>
-    </div>
-    <div class="info-row">
-        <span class="info-label">누적 발행</span>
-        <span class="info-value" id="stat-share-total">—</span>
+    <div style="width:1px;background:var(--border);margin:16px 0;"></div>
+    <div style="flex:1;padding:22px;">
+        <div class="info-row">
+            <span class="info-label">오늘 발행</span>
+            <span class="info-value" id="stat-share-today">—</span>
+        </div>
+        <div class="info-row" style="border-bottom:none;">
+            <span class="info-label">누적 발행</span>
+            <span class="info-value" id="stat-share-total">—</span>
+        </div>
     </div>
 </div>
 
@@ -300,7 +305,9 @@ async function saveToken() {
         document.getElementById('upd-time').value = nowPlusOne();
 
         document.getElementById('sec-token').classList.add('hidden');
-        document.getElementById('sec-stats').classList.remove('hidden');
+        const statsEl = document.getElementById('sec-stats');
+        statsEl.classList.remove('hidden');
+        statsEl.style.display = 'flex';
         document.getElementById('sec-info').classList.remove('hidden');
         document.getElementById('sec-form').classList.remove('hidden');
         addLog('✓ 연결 완료', 'ok');
