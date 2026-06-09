@@ -673,7 +673,7 @@ function _showAnswerModal() {
             wordColor = won ? C.green : '#ff6b6b';
         }
         wSpan.textContent = wordText;
-        wSpan.style.cssText = `font-size:0.88rem;color:${wordColor};`;
+        wSpan.style.cssText = `font-size:0.88rem;color:${wordColor};font-weight:${isCurrent ? '700' : '400'};`;
 
         cell.appendChild(hSpan);
         cell.appendChild(wSpan);
