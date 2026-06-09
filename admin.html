@@ -323,8 +323,8 @@ async function fetchStats() {
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
         const [r, rShare] = await Promise.all([
-            fetch(`${base}?daily=true`, { headers }),
-            fetch(`${base}?daily=true&path=share-generated`, { headers })
+            fetch(`${base}?daily=true&exclude_paths=share-generated,/KoreanWordGame/share,/KoreanWordGame/share.html&path_by_name=true`, { headers }),
+            fetch(`${base}?daily=true&include_paths=share-generated&path_by_name=true`, { headers })
         ]);
         if (!r.ok) {
             const err = await r.text();
