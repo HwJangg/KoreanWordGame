@@ -441,7 +441,7 @@ function endGame(msg, type) {
     _saveGame(msg, type);
     $submitBtn.style.display = 'none';
     _showEndButtons();
-    if (_saveKey === 'daily') _saveHourResult(type === 'success');
+    if (_saveKey === 'daily') _saveHourResult(type === 'success' ? 'green' : 'red');
 }
 
 function getShareWord() {
@@ -552,6 +552,8 @@ function submit() {
     attempt++;
     cacheCells();
 
+    if (gameHistory.length === 1 && _saveKey === 'daily') _saveHourResult('yellow');
+
     const won = result.every(r => r.color === 'green');
     if (!won && attempt < MAX) _saveGame();
     setTimeout(() => {
@@ -606,13 +608,13 @@ function _kstDateStr() {
     return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
 }
 
-function _saveHourResult(won) {
+function _saveHourResult(result) {
     const date = _kstDateStr();
     const hour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem('hour_results') || '{}'); } catch {}
     const results = saved.date === date ? (saved.results || {}) : {};
-    results[String(hour)] = won ? 'green' : 'red';
+    results[String(hour)] = result;
     localStorage.setItem('hour_results', JSON.stringify({ date, results }));
 }
 
@@ -661,7 +663,7 @@ function _showAnswerModal() {
         hSpan.textContent = `${h}시`;
         const hColor = isCurrent
             ? (gameOver ? (won ? C.green : '#ff6b6b') : (gameHistory.length > 0 ? C.yellow : '#fff'))
-            : C.muted;
+            : (hourResults[String(h)] === 'yellow' ? C.yellow : C.muted);
         hSpan.style.cssText = `font-size:0.75rem;color:${hColor};min-width:26px;text-align:right;font-weight:${isCurrent ? '700' : '400'};`;
 
         const wSpan = document.createElement('span');
@@ -671,6 +673,7 @@ function _showAnswerModal() {
             const r = hourResults[String(h)];
             if (r === 'green') wordColor = C.green;
             else if (r === 'red') wordColor = '#ff6b6b';
+            else if (r === 'yellow') wordColor = C.yellow;
         } else if (h === kstHour && gameOver) {
             wordText = answer;
             wordColor = won ? C.green : '#ff6b6b';
