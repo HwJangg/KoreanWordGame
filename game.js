@@ -659,7 +659,7 @@ function _showAnswerModal() {
     box.appendChild(title);
 
     const cols = document.createElement('div');
-    cols.style.cssText = 'display:flex;gap:8px;margin-bottom:14px;';
+    cols.style.cssText = 'display:flex;gap:8px;margin-bottom:19px;';
     const leftCol = document.createElement('div');
     leftCol.style.cssText = 'flex:1;';
     const rightCol = document.createElement('div');
