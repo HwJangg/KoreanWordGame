@@ -138,12 +138,20 @@
     </div>
     <div class="card" style="flex:1;max-width:none;margin-bottom:0;">
         <div class="info-row">
-            <span class="info-label">오늘 발행</span>
+            <span class="info-label">오늘 발행 <span style="font-size:0.7rem;color:#555">(JSON)</span></span>
             <span class="info-value" id="stat-share-today">—</span>
         </div>
-        <div class="info-row" style="border-bottom:none;">
-            <span class="info-label">누적 발행</span>
+        <div class="info-row">
+            <span class="info-label">누적 발행 <span style="font-size:0.7rem;color:#555">(JSON)</span></span>
             <span class="info-value" id="stat-share-total">—</span>
+        </div>
+        <div class="info-row">
+            <span class="info-label">오늘 발행 <span style="font-size:0.7rem;color:#555">(GC)</span></span>
+            <span class="info-value" id="stat-share-today-gc">—</span>
+        </div>
+        <div class="info-row" style="border-bottom:none;">
+            <span class="info-label">누적 발행 <span style="font-size:0.7rem;color:#555">(GC)</span></span>
+            <span class="info-value" id="stat-share-total-gc">—</span>
         </div>
     </div>
 </div>
@@ -325,8 +333,9 @@ async function fetchStats() {
 
         const kstToday = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
 
-        const [r, wjR] = await Promise.all([
+        const [r, rShare, wjR] = await Promise.all([
             fetch(`${base}?daily=true`, { headers }),
+            fetch(`${base}?daily=true&include_paths=share-generated&path_by_name=true`, { headers }),
             fetch(`https://raw.githubusercontent.com/HwJangg/KoreanWordGame/master/word.json?t=${Date.now()}`)
         ]);
         if (!r.ok) {
@@ -363,6 +372,14 @@ async function fetchStats() {
         } else {
             document.getElementById('stat-share-today').textContent = '—';
             document.getElementById('stat-share-total').textContent = '—';
+        }
+
+        if (rShare.ok) {
+            const dShare = await rShare.json();
+            const sumToday2 = (data) => { let n = 0; for (const hit of (data.hits || [])) for (const stat of (hit.stats || [])) if ((stat.day || '').startsWith(today)) n += stat.daily || 0; return n; };
+            const sumTotal2 = (data) => (data.hits || []).reduce((s, h) => s + (h.count || 0), 0);
+            document.getElementById('stat-share-today-gc').textContent = sumToday2(dShare).toLocaleString();
+            document.getElementById('stat-share-total-gc').textContent = sumTotal2(dShare).toLocaleString();
         }
     } catch(e) {
         addLog(`통계 오류: ${e.message}`, 'err');
