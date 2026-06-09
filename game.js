@@ -3,7 +3,7 @@
 const MAX = 5;
 
 const C = {
-    green:  '#669966',
+    green:  '#538d4e',
     yellow: '#b59f3b',
     gray:   '#3a3a3c',
     border: '#565758',
