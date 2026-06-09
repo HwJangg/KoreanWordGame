@@ -644,7 +644,6 @@ function _loadHourResults() {
 function _showAnswerModal() {
     if (document.getElementById('answer-modal')) return;
     const kstHour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
-    if (kstHour >= 23) { const b = document.getElementById('answer-reveal-btn'); if (b) b.remove(); return; }
 
     const overlay = document.createElement('div');
     overlay.id = 'answer-modal';
@@ -721,7 +720,6 @@ function _injectAnswerBtn() {
     if (!path.endsWith('/') && !path.endsWith('index.html')) return;
     if (document.getElementById('answer-reveal-btn')) return;
     const kstHour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
-    if (kstHour >= 23) return;
 
     const header = document.querySelector('header');
     if (!header) return;
