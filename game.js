@@ -2,6 +2,15 @@
 
 const MAX = 5;
 
+const C = {
+    green:  '#669966',
+    yellow: '#b59f3b',
+    gray:   '#3a3a3c',
+    border: '#565758',
+    muted:  '#818384',
+    dark:   '#1e1e20',
+};
+
 // 자모 표시 문자 (CHO/JUNG/JONG_KEYS와 인덱스·글자수 1:1 대응)
 const CHO_JAMO = [
     'ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ',
@@ -392,7 +401,7 @@ function _shareResult() {
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'game-toast';
-            toast.style.cssText = 'position:fixed;top:55px;left:50%;transform:translateX(-50%);background:#669966;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
+            toast.style.cssText = `position:fixed;top:55px;left:50%;transform:translateX(-50%);background:${C.green};color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;`;
             document.body.appendChild(toast);
         }
         toast.textContent = '게임 결과가 복사되었습니다';
@@ -537,18 +546,18 @@ function _injectRules() {
     modal.onclick = (e) => { if (e.target === modal) modal.style.display = 'none'; };
 
     const box = document.createElement('div');
-    box.style.cssText = 'background:#1e1e20;border:1px solid #3a3a3c;border-radius:12px;padding:28px 24px 20px;max-width:300px;width:88%;box-sizing:border-box;';
+    box.style.cssText = `background:${C.dark};border:1px solid ${C.gray};border-radius:12px;padding:28px 24px 20px;max-width:300px;width:88%;box-sizing:border-box;`;
 
     const tile = (ch, bg) => `<span style="width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;font-size:1.05rem;font-weight:700;color:#fff;background:${bg};flex-shrink:0;">${ch}</span>`;
     const row  = (ch, bg, text) => `<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:0.88rem;">${tile(ch, bg)} ${text}</div>`;
 
     box.innerHTML = `
         <h2 style="font-size:1rem;margin-bottom:14px;text-align:center;letter-spacing:1px;">게임 규칙</h2>
-        <p style="font-size:0.82rem;color:#818384;margin-bottom:18px;line-height:1.6;text-align:center;">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 글자의 색으로 힌트를 확인하세요.</p>
-        ${row('ㅏ', '#669966', '정확한 자리의 글자')}
-        ${row('ㄱ', '#b59f3b', '단어에 있지만 자리가 다른 글자')}
-        ${row('ㅎ', '#3a3a3c', '단어에 없는 글자')}
-        <button id="rules-ok-btn" style="width:100%;padding:10px;margin-top:10px;background:#669966;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>`;
+        <p style="font-size:0.82rem;color:${C.muted};margin-bottom:18px;line-height:1.6;text-align:center;">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 글자의 색으로 힌트를 확인하세요.</p>
+        ${row('ㅏ', C.green, '정확한 자리의 글자')}
+        ${row('ㄱ', C.yellow, '단어에 있지만 자리가 다른 글자')}
+        ${row('ㅎ', C.gray, '단어에 없는 글자')}
+        <button id="rules-ok-btn" style="width:100%;padding:10px;margin-top:10px;background:${C.green};color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>`;
 
     modal.appendChild(box);
     document.body.appendChild(modal);
@@ -559,10 +568,10 @@ function _injectRules() {
     if (header) {
         header.style.position = 'relative';
         const btn = document.createElement('button');
-        btn.style.cssText = 'position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:1px solid #565758;color:#818384;width:28px;height:28px;border-radius:50%;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;touch-action:manipulation;';
+        btn.style.cssText = `position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:1px solid ${C.border};color:${C.muted};width:28px;height:28px;border-radius:50%;font-size:0.85rem;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;touch-action:manipulation;`;
         btn.textContent = '?';
         btn.onmouseenter = () => { btn.style.color = '#fff'; btn.style.borderColor = '#fff'; };
-        btn.onmouseleave = () => { btn.style.color = '#818384'; btn.style.borderColor = '#565758'; };
+        btn.onmouseleave = () => { btn.style.color = C.muted; btn.style.borderColor = C.border; };
         btn.onclick = () => { modal.style.display = 'flex'; };
         header.appendChild(btn);
     }
@@ -579,7 +588,7 @@ function _showAnswerModal() {
     overlay.onclick = (e) => { if (e.target === overlay) overlay.remove(); };
 
     const box = document.createElement('div');
-    box.style.cssText = 'background:#1e1e20;border:1px solid #3a3a3c;border-radius:12px;padding:20px 18px 16px;max-width:320px;width:92%;box-sizing:border-box;';
+    box.style.cssText = `background:${C.dark};border:1px solid ${C.gray};border-radius:12px;padding:20px 18px 16px;max-width:320px;width:92%;box-sizing:border-box;`;
 
     const title = document.createElement('h2');
     title.textContent = '정답 단어';
@@ -597,12 +606,12 @@ function _showAnswerModal() {
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
-        const borderColor = isCurrent ? (won ? '#669966' : '#565758') : 'transparent';
+        const borderColor = isCurrent ? (won ? C.green : C.border) : 'transparent';
         cell.style.cssText = `display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;border:1px solid ${borderColor};`;
 
         const hSpan = document.createElement('span');
         hSpan.textContent = `${h}시`;
-        hSpan.style.cssText = 'font-size:0.75rem;color:#818384;min-width:26px;';
+        hSpan.style.cssText = `font-size:0.75rem;color:${C.muted};min-width:26px;`;
 
         const wSpan = document.createElement('span');
         wSpan.textContent = h < kstHour ? (todayWords[String(h)] || '—')
@@ -619,7 +628,7 @@ function _showAnswerModal() {
 
     const okBtn = document.createElement('button');
     okBtn.textContent = '확인';
-    okBtn.style.cssText = 'width:100%;padding:10px;background:#669966;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;';
+    okBtn.style.cssText = `width:100%;padding:10px;background:${C.green};color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;`;
     okBtn.onclick = () => overlay.remove();
     box.appendChild(okBtn);
 
@@ -640,9 +649,9 @@ function _injectAnswerBtn() {
     const btn = document.createElement('button');
     btn.id = 'answer-reveal-btn';
     btn.textContent = '⏱';
-    btn.style.cssText = 'position:absolute;right:48px;top:50%;transform:translateY(-50%);background:none;border:1px solid #565758;color:#818384;width:28px;height:28px;border-radius:50%;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;touch-action:manipulation;';
+    btn.style.cssText = `position:absolute;right:48px;top:50%;transform:translateY(-50%);background:none;border:1px solid ${C.border};color:${C.muted};width:28px;height:28px;border-radius:50%;font-size:0.78rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;touch-action:manipulation;`;
     btn.onmouseenter = () => { btn.style.color = '#fff'; btn.style.borderColor = '#fff'; };
-    btn.onmouseleave = () => { btn.style.color = '#818384'; btn.style.borderColor = '#565758'; };
+    btn.onmouseleave = () => { btn.style.color = C.muted; btn.style.borderColor = C.border; };
     btn.onclick = _showAnswerModal;
     header.appendChild(btn);
 }
@@ -671,7 +680,7 @@ function init() {
         endRow.id = 'end-btn-row';
         endRow.style.cssText = 'display:none;width:100%;max-width:480px;gap:8px;margin-top:8px;box-sizing:border-box;';
 
-        const btnCss = 'flex:1;min-width:0;padding:13px;font-size:1rem;font-weight:700;background:#3a3a3c;color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;text-align:center;text-decoration:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1.2;';
+        const btnCss = `flex:1;min-width:0;padding:13px;font-size:1rem;font-weight:700;background:${C.gray};color:#fff;border:none;border-radius:6px;cursor:pointer;font-family:inherit;touch-action:manipulation;transition:filter 0.15s;text-align:center;text-decoration:none;box-sizing:border-box;display:flex;align-items:center;justify-content:center;line-height:1.2;`;
 
         const shareBtn = document.createElement('button');
         shareBtn.id = 'share-result-btn';
@@ -724,7 +733,7 @@ function init() {
             makeBtn.textContent = '새 도전장 만들기 ▶';
             makeBtn.style.display = 'block';
             makeBtn.style.marginTop = '28px';
-            makeBtn.style.background = '#3a3a3c';
+            makeBtn.style.background = C.gray;
             makeBtn.style.color = '#fff';
             makeBtn.style.border = 'none';
             makeBtn.style.transition = 'filter 0.15s';

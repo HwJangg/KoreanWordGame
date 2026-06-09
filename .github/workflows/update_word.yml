@@ -1,9 +1,7 @@
 name: 시간별 단어 자동 갱신
 
 on:
-  schedule:
-    - cron: '0 * * * *'   # 매시 정각 (UTC) = 한국 시간 매시 9시~10시
-  workflow_dispatch:        # 수동 실행 (GitHub Actions 탭에서 즉시 트리거)
+  workflow_dispatch:        # cron-job.org 에서 매시 정각 트리거
 
 jobs:
   update:
