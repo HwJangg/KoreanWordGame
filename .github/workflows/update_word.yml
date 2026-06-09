@@ -42,7 +42,9 @@ jobs:
 
           with open('word.json', 'w', encoding='utf-8') as f:
               json.dump({'word': new_word, 'last': current_word, 'updated': updated,
-                         'today_date': today_date, 'today_words': today_words},
+                         'today_date': today_date, 'today_words': today_words,
+                         'share_total': current.get('share_total', 0),
+                         'share_today': current.get('share_today', {'date': '', 'count': 0})},
                         f, ensure_ascii=False, indent=2)
               f.write('\n')
 
