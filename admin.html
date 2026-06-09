@@ -124,6 +124,18 @@
     <button onclick="saveToken()">확인</button>
 </div>
 
+<!-- 방문자 통계 -->
+<div class="card hidden" id="sec-stats">
+    <div class="info-row">
+        <span class="info-label">오늘 방문자</span>
+        <span class="info-value" id="stat-today">—</span>
+    </div>
+    <div class="info-row">
+        <span class="info-label">누적 방문자</span>
+        <span class="info-value" id="stat-total">—</span>
+    </div>
+</div>
+
 <!-- 현재 상태 -->
 <div class="card hidden" id="sec-info">
     <div class="info-row">
@@ -164,8 +176,9 @@ const OWNER  = 'HwJangg';
 const REPO   = 'KoreanWordGame';
 const FILE   = 'word.json';
 const BRANCH = 'master';
-const TOKEN  = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,78,76,51,85,79,65,48,104,97,80,112,112,100,102,110,73,109,105,82,95,88,87,105,121,114,107,107,84,49,50,71,117,114,104,71,103,116,76,48,119,82,115,101,67,112,112,48,122,54,55,52,112,105,122,106,79,74,112,100,100,75,48,100,90,68,86,68,76,81,67,73,57,85,75,86,84,55,86,86].map(c=>String.fromCharCode(c)).join('');
-const PW     = '1234';
+const TOKEN    = [103,105,116,104,117,98,95,112,97,116,95,49,49,66,78,76,51,85,79,65,48,104,97,80,112,112,100,102,110,73,109,105,82,95,88,87,105,121,114,107,107,84,49,50,71,117,114,104,71,103,116,76,48,119,82,115,101,67,112,112,48,122,54,55,52,112,105,122,106,79,74,112,100,100,75,48,100,90,68,86,68,76,81,67,73,57,85,75,86,84,55,86,86].map(c=>String.fromCharCode(c)).join('');
+const GC_TOKEN = [53,100,49,122,52,102,122,102,109,119,107,111,101,109,48,112,56,97,57,55,99,120,117,106,49,57,111,49,97,50,107,49,104,119,110,107,55,104,97,112,48,122,48,104,122,57,114,101,99].map(c=>String.fromCharCode(c)).join('');
+const PW       = '1234';
 
 // ── 자모 카운트 ──────────────────────────────────────────────────────────────
 const CHO_JAMO  = ['ㄱ','ㄱㄱ','ㄴ','ㄷ','ㄷㄷ','ㄹ','ㅁ','ㅂ','ㅂㅂ','ㅅ','ㅅㅅ','ㅇ','ㅈ','ㅈㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
@@ -279,11 +292,36 @@ async function saveToken() {
         document.getElementById('upd-time').value = nowPlusOne();
 
         document.getElementById('sec-token').classList.add('hidden');
+        document.getElementById('sec-stats').classList.remove('hidden');
         document.getElementById('sec-info').classList.remove('hidden');
         document.getElementById('sec-form').classList.remove('hidden');
         addLog('✓ 연결 완료', 'ok');
+        fetchStats();
     } catch(e) {
         addLog(`✗ ${e.message}`, 'err');
+    }
+}
+
+async function fetchStats() {
+    try {
+        const today = new Date().toISOString().slice(0, 10);
+        const headers = { Authorization: `Bearer ${GC_TOKEN}` };
+        const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
+
+        const [rToday, rTotal] = await Promise.all([
+            fetch(`${base}?start=${today}&end=${today}`, { headers }),
+            fetch(`${base}?start=2020-01-01&end=${today}`, { headers })
+        ]);
+        const dToday = await rToday.json();
+        const dTotal = await rTotal.json();
+
+        document.getElementById('stat-today').textContent =
+            (dToday.total_unique ?? dToday.total ?? '—').toLocaleString();
+        document.getElementById('stat-total').textContent =
+            (dTotal.total_unique ?? dTotal.total ?? '—').toLocaleString();
+    } catch(e) {
+        document.getElementById('stat-today').textContent = '오류';
+        document.getElementById('stat-total').textContent = '오류';
     }
 }
 
