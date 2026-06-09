@@ -217,12 +217,12 @@ window.generateLink = function() {
     const encoded = encodeWord(word);
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
-    document.getElementById('link-box').classList.remove('hidden');
-    (function() {
-        var _d = new URLSearchParams({ p: 'share-generated', t: '링크 발행', e: 'true', ns: '1', rnd: Math.random().toString(36).substr(2, 5), r: document.referrer || '' });
-        if (navigator.sendBeacon) { navigator.sendBeacon('https://scentofgrasse.goatcounter.com/count', _d); }
-        else { new Image().src = 'https://scentofgrasse.goatcounter.com/count?' + _d; }
-    }());
+    const linkBox = document.getElementById('link-box');
+    const isFirstAppear = linkBox.classList.contains('hidden');
+    linkBox.classList.remove('hidden');
+    if (isFirstAppear) {
+        new Image().src = 'https://scentofgrasse.goatcounter.com/count?' + new URLSearchParams({ p: 'share-generated', t: '링크 발행', e: '1', ns: '1', rnd: Math.random().toString(36).substr(2, 5), r: document.referrer || '' });
+    }
     navigator.clipboard.writeText(url).then(() => {
         const toast = document.getElementById('toast');
         toast.classList.add('show');
