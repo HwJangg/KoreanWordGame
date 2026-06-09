@@ -218,7 +218,7 @@ window.generateLink = function() {
     const url = new URL('play.html', location.href).href + '?w=' + encoded;
     document.getElementById('link-text').textContent = url;
     document.getElementById('link-box').classList.remove('hidden');
-    if (window.goatcounter) window.goatcounter.count({ path: 'share-generated', title: '링크 발행', event: true });
+    new Image().src = 'https://scentofgrasse.goatcounter.com/count?p=share-generated&t=' + encodeURIComponent('링크 발행') + '&e=1&r=' + encodeURIComponent(document.referrer || '');
     navigator.clipboard.writeText(url).then(() => {
         const toast = document.getElementById('toast');
         toast.classList.add('show');
