@@ -322,7 +322,7 @@ async function fetchStats() {
         for (const hit of (d.hits || [])) {
             totalCount += hit.count || 0;
             for (const stat of (hit.stats || [])) {
-                if ((stat.day || '').startsWith(today)) todayCount += stat.count || 0;
+                if ((stat.day || '').startsWith(today)) todayCount += stat.daily || 0;
             }
         }
 
