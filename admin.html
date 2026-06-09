@@ -308,20 +308,28 @@ async function fetchStats() {
         const headers = { Authorization: `Bearer ${GC_TOKEN}` };
         const base = 'https://scentofgrasse.goatcounter.com/api/v0/stats/hits';
 
-        const [rToday, rTotal] = await Promise.all([
-            fetch(`${base}?start=${today}&end=${today}`, { headers }),
-            fetch(`${base}?start=2020-01-01&end=${today}`, { headers })
-        ]);
+        const rToday = await fetch(`${base}?start=${today}&end=${today}`, { headers });
+        const rTotal = await fetch(`${base}?start=2020-01-01&end=${today}`, { headers });
+
+        if (!rToday.ok) {
+            const err = await rToday.text();
+            addLog(`통계 오류 ${rToday.status}: ${err}`, 'err');
+            document.getElementById('stat-today').textContent = '—';
+            document.getElementById('stat-total').textContent = '—';
+            return;
+        }
+
         const dToday = await rToday.json();
         const dTotal = await rTotal.json();
 
-        document.getElementById('stat-today').textContent =
-            (dToday.total_unique ?? dToday.total ?? '—').toLocaleString();
-        document.getElementById('stat-total').textContent =
-            (dTotal.total_unique ?? dTotal.total ?? '—').toLocaleString();
+        const sumUnique = d => (d.hits || []).reduce((s, h) => s + (h.count_unique || 0), 0);
+
+        document.getElementById('stat-today').textContent = sumUnique(dToday).toLocaleString();
+        document.getElementById('stat-total').textContent = sumUnique(dTotal).toLocaleString();
     } catch(e) {
-        document.getElementById('stat-today').textContent = '오류';
-        document.getElementById('stat-total').textContent = '오류';
+        addLog(`통계 오류: ${e.message}`, 'err');
+        document.getElementById('stat-today').textContent = '—';
+        document.getElementById('stat-total').textContent = '—';
     }
 }
 
