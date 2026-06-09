@@ -441,6 +441,7 @@ function endGame(msg, type) {
     _saveGame(msg, type);
     $submitBtn.style.display = 'none';
     _showEndButtons();
+    if (_saveKey === 'daily') _saveHourResult(type === 'success');
 }
 
 function getShareWord() {
@@ -601,6 +602,28 @@ function _injectRules() {
     }
 }
 
+function _kstDateStr() {
+    return new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10);
+}
+
+function _saveHourResult(won) {
+    const date = _kstDateStr();
+    const hour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
+    let saved = {};
+    try { saved = JSON.parse(localStorage.getItem('hour_results') || '{}'); } catch {}
+    const results = saved.date === date ? (saved.results || {}) : {};
+    results[String(hour)] = won ? 'green' : 'red';
+    localStorage.setItem('hour_results', JSON.stringify({ date, results }));
+}
+
+function _loadHourResults() {
+    try {
+        const saved = JSON.parse(localStorage.getItem('hour_results') || '{}');
+        if (saved.date === _kstDateStr()) return saved.results || {};
+    } catch {}
+    return {};
+}
+
 function _showAnswerModal() {
     if (document.getElementById('answer-modal')) return;
     const kstHour = new Date(Date.now() + 9 * 3600 * 1000).getUTCHours();
@@ -627,6 +650,7 @@ function _showAnswerModal() {
     rightCol.style.cssText = 'flex:1;';
 
     const won = gameOver && gameHistory.length > 0 && gameHistory[gameHistory.length - 1].every(r => r.color === 'green');
+    const hourResults = _loadHourResults();
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
@@ -638,9 +662,18 @@ function _showAnswerModal() {
         hSpan.style.cssText = `font-size:0.75rem;color:${isCurrent ? '#fff' : C.muted};min-width:26px;font-weight:${isCurrent ? '700' : '400'};`;
 
         const wSpan = document.createElement('span');
-        wSpan.textContent = h < kstHour ? (todayWords[String(h)] || '—')
-            : (h === kstHour && gameOver) ? answer : '';
-        wSpan.style.cssText = 'font-size:0.88rem;color:#aaa;';
+        let wordText = '', wordColor = '#aaa';
+        if (h < kstHour) {
+            wordText = todayWords[String(h)] || '—';
+            const r = hourResults[String(h)];
+            if (r === 'green') wordColor = C.green;
+            else if (r === 'red') wordColor = '#ff6b6b';
+        } else if (h === kstHour && gameOver) {
+            wordText = answer;
+            wordColor = won ? C.green : '#ff6b6b';
+        }
+        wSpan.textContent = wordText;
+        wSpan.style.cssText = `font-size:0.88rem;color:${wordColor};`;
 
         cell.appendChild(hSpan);
         cell.appendChild(wSpan);
