@@ -125,8 +125,8 @@
 </div>
 
 <!-- 방문자 통계 -->
-<div class="card hidden" id="sec-stats" style="display:none;flex-direction:row;gap:0;padding:0;">
-    <div style="flex:1;padding:22px;">
+<div id="sec-stats" style="display:none;flex-direction:row;gap:12px;width:100%;max-width:380px;margin-bottom:12px;">
+    <div class="card" style="flex:1;max-width:none;margin-bottom:0;">
         <div class="info-row">
             <span class="info-label">오늘 플레이</span>
             <span class="info-value" id="stat-today">—</span>
@@ -136,8 +136,7 @@
             <span class="info-value" id="stat-total">—</span>
         </div>
     </div>
-    <div style="width:1px;background:var(--border);margin:16px 0;"></div>
-    <div style="flex:1;padding:22px;">
+    <div class="card" style="flex:1;max-width:none;margin-bottom:0;">
         <div class="info-row">
             <span class="info-label">오늘 발행</span>
             <span class="info-value" id="stat-share-today">—</span>
