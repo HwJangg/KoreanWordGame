@@ -58,7 +58,7 @@ class App(tk.Tk):
     FG       = '#ffffff'
     GRAY     = '#888888'
     ENTRY_BG = '#2d2d44'
-    GREEN    = '#538d4e'
+    GREEN    = '#669966'
     RED      = '#ff6b6b'
 
     def __init__(self):

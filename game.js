@@ -392,7 +392,7 @@ function _shareResult() {
         if (!toast) {
             toast = document.createElement('div');
             toast.id = 'game-toast';
-            toast.style.cssText = 'position:fixed;top:55px;left:50%;transform:translateX(-50%);background:#538d4e;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
+            toast.style.cssText = 'position:fixed;top:55px;left:50%;transform:translateX(-50%);background:#669966;color:#fff;padding:6px 22px;border-radius:20px;font-size:0.9rem;font-weight:600;opacity:0;transition:opacity 0.3s;pointer-events:none;z-index:50;white-space:nowrap;';
             document.body.appendChild(toast);
         }
         toast.textContent = '게임 결과가 복사되었습니다';
@@ -545,10 +545,10 @@ function _injectRules() {
     box.innerHTML = `
         <h2 style="font-size:1rem;margin-bottom:14px;text-align:center;letter-spacing:1px;">게임 규칙</h2>
         <p style="font-size:0.82rem;color:#818384;margin-bottom:18px;line-height:1.6;text-align:center;">한글 단어를 5번 안에 맞추세요.<br>매 입력 후 글자의 색으로 힌트를 확인하세요.</p>
-        ${row('ㅏ', '#538d4e', '정확한 자리의 글자')}
+        ${row('ㅏ', '#669966', '정확한 자리의 글자')}
         ${row('ㄱ', '#b59f3b', '단어에 있지만 자리가 다른 글자')}
         ${row('ㅎ', '#3a3a3c', '단어에 없는 글자')}
-        <button id="rules-ok-btn" style="width:100%;padding:10px;margin-top:10px;background:#538d4e;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>`;
+        <button id="rules-ok-btn" style="width:100%;padding:10px;margin-top:10px;background:#669966;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;">확인</button>`;
 
     modal.appendChild(box);
     document.body.appendChild(modal);
@@ -597,7 +597,7 @@ function _showAnswerModal() {
     for (let h = 0; h < 24; h++) {
         const cell = document.createElement('div');
         const isCurrent = h === kstHour;
-        const borderColor = isCurrent ? (won ? '#538d4e' : '#565758') : 'transparent';
+        const borderColor = isCurrent ? (won ? '#669966' : '#565758') : 'transparent';
         cell.style.cssText = `display:flex;align-items:center;gap:6px;padding:3px 5px;border-radius:4px;border:1px solid ${borderColor};`;
 
         const hSpan = document.createElement('span');
@@ -619,7 +619,7 @@ function _showAnswerModal() {
 
     const okBtn = document.createElement('button');
     okBtn.textContent = '확인';
-    okBtn.style.cssText = 'width:100%;padding:10px;background:#538d4e;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;';
+    okBtn.style.cssText = 'width:100%;padding:10px;background:#669966;color:#fff;border:none;border-radius:6px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;';
     okBtn.onclick = () => overlay.remove();
     box.appendChild(okBtn);
 
