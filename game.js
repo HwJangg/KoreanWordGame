@@ -619,13 +619,16 @@ function _saveHourResult(result) {
 }
 
 function _cleanupStaleStorage() {
-    const today = _kstDateStr();
+    const todayKst     = _kstDateStr();
+    const todaySession = _sessionDay();
     Object.keys(localStorage)
         .filter(k => k === 'daily' || k === 'hour_results' || k.startsWith('play_'))
         .forEach(key => {
             try {
                 const saved = JSON.parse(localStorage.getItem(key) || '{}');
-                if (saved.date && saved.date !== today) localStorage.removeItem(key);
+                if (!saved.date) return;
+                const today = (key === 'hour_results') ? todayKst : todaySession;
+                if (saved.date !== today) localStorage.removeItem(key);
             } catch { localStorage.removeItem(key); }
         });
 }
