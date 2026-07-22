@@ -1,10 +1,11 @@
 {
-  "word": "검지",
-  "last": "고망",
-  "updated": "2026-07-23 00:02",
+  "word": "이웃",
+  "last": "검지",
+  "updated": "2026-07-23 01:00",
   "today_date": "2026-07-23",
   "today_words": {
-    "0": "검지"
+    "0": "검지",
+    "1": "이웃"
   },
   "share_total": 13,
   "share_today": {
