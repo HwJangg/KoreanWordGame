@@ -1,10 +1,11 @@
 {
-  "word": "주불",
-  "last": "이순",
-  "updated": "2026-08-01 00:02",
+  "word": "역초",
+  "last": "주불",
+  "updated": "2026-08-01 01:00",
   "today_date": "2026-08-01",
   "today_words": {
-    "0": "주불"
+    "0": "주불",
+    "1": "역초"
   },
   "share_total": 13,
   "share_today": {
