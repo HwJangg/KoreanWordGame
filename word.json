@@ -1,10 +1,11 @@
 {
-  "word": "인지",
-  "last": "서국",
-  "updated": "2026-08-12 00:02",
+  "word": "주역",
+  "last": "인지",
+  "updated": "2026-08-12 01:00",
   "today_date": "2026-08-12",
   "today_words": {
-    "0": "인지"
+    "0": "인지",
+    "1": "주역"
   },
   "share_total": 13,
   "share_today": {
