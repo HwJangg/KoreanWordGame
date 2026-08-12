@@ -1,10 +1,11 @@
 {
-  "word": "들리",
-  "last": "요정",
-  "updated": "2026-08-13 00:02",
+  "word": "외로",
+  "last": "들리",
+  "updated": "2026-08-13 01:00",
   "today_date": "2026-08-13",
   "today_words": {
-    "0": "들리"
+    "0": "들리",
+    "1": "외로"
   },
   "share_total": 13,
   "share_today": {
