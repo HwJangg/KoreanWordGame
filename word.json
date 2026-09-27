@@ -1,10 +1,11 @@
 {
-  "word": "상지",
-  "last": "자절",
-  "updated": "2026-09-28 00:02",
+  "word": "동서",
+  "last": "상지",
+  "updated": "2026-09-28 01:00",
   "today_date": "2026-09-28",
   "today_words": {
-    "0": "상지"
+    "0": "상지",
+    "1": "동서"
   },
   "share_total": 13,
   "share_today": {
