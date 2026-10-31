@@ -1,10 +1,11 @@
 {
-  "word": "당사",
-  "last": "매스",
-  "updated": "2026-11-01 00:02",
+  "word": "선표",
+  "last": "당사",
+  "updated": "2026-11-01 01:00",
   "today_date": "2026-11-01",
   "today_words": {
-    "0": "당사"
+    "0": "당사",
+    "1": "선표"
   },
   "share_total": 13,
   "share_today": {
